@@ -1,0 +1,12 @@
+SELECT Dname, COUNT(SSN) FROM DEPARTMENT d, EMPLOYEE e WHERE d.Dnumber=e.Dno GROUP BY Dno HAVING AVG(Salary) > 30000;
+
+SELECT Dname "Department Name", COUNT(SSN) "Male employees" FROM EMPLOYEE e, DEPARTMENT d WHERE Salary > 30000 AND Sex='M' AND d.Dnumber=e.Dno GROUP BY Dno;  
+
+#SELECT Dname, COUNT(*) FROM DEPARTMENT d, EMPLOYEE e WHERE Sex = 'M' AND d.Dnumber=e.Dno GROUP BY Dno HAVING AVG(Salary) > 30000;
+
+SELECT Fname, Lname FROM EMPLOYEE e WHERE Dno IN (SELECT Dno FROM EMPLOYEE e WHERE Salary = (SELECT Max(Salary) FROM EMPLOYEE));
+
+SELECT Min(Salary) FROM EMPLOYEE INTO @MinSal;
+SELECT Fname, Lname FROM EMPLOYEE e WHERE Salary - @MinSal >= 10000;
+
+
