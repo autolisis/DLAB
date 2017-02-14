@@ -1,0 +1,69 @@
+mysql> desc flight;
++----------+-------------+------+-----+---------+-------+
+| Field    | Type        | Null | Key | Default | Extra |
++----------+-------------+------+-----+---------+-------+
+| no       | int(11)     | NO   | PRI | 0       |       |
+| frm      | varchar(20) | YES  |     | NULL    |       |
+| too      | varchar(20) | YES  |     | NULL    |       |
+| distance | int(11)     | YES  |     | NULL    |       |
+| departs  | varchar(20) | YES  |     | NULL    |       |
+| arrives  | varchar(20) | YES  |     | NULL    |       |
+| price    | double      | YES  |     | NULL    |       |
++----------+-------------+------+-----+---------+-------+
+7 rows in set (0.00 sec)
+
+mysql> desc aircraft;
++---------------+-------------+------+-----+---------+-------+
+| Field         | Type        | Null | Key | Default | Extra |
++---------------+-------------+------+-----+---------+-------+
+| aid           | int(11)     | NO   | PRI | 0       |       |
+| aname         | varchar(20) | YES  |     | NULL    |       |
+| cruisingrange | int(11)     | YES  |     | NULL    |       |
++---------------+-------------+------+-----+---------+-------+
+3 rows in set (0.00 sec)
+
+mysql> desc certified;
++-------+---------+------+-----+---------+-------+
+| Field | Type    | Null | Key | Default | Extra |
++-------+---------+------+-----+---------+-------+
+| eid   | int(11) | NO   | PRI | 0       |       |
+| aid   | int(11) | NO   | PRI | 0       |       |
++-------+---------+------+-----+---------+-------+
+2 rows in set (0.00 sec)
+
+mysql> desc employees;
++--------+-------------+------+-----+---------+-------+
+| Field  | Type        | Null | Key | Default | Extra |
++--------+-------------+------+-----+---------+-------+
+| eid    | int(11)     | NO   | PRI | 0       |       |
+| ename  | varchar(20) | YES  |     | NULL    |       |
+| salary | int(11)     | YES  |     | NULL    |       |
++--------+-------------+------+-----+---------+-------+
+3 rows in set (0.00 sec)
+
+mysql> select distinct(aname)
+    -> from aircraft a, employees e, certified c
+    -> Ctrl-C -- exit!
+Aborted
+mysql> select distinct aname from aircraft where aid in (select aid from certified natural join employees where salary > 80000)
+    -> ;
++------------+
+| aname      |
++------------+
+| Airbus     |
+| Boeing     |
+| Jet01      |
+| Airbus380  |
+| Aircraft02 |
++------------+
+5 rows in set (0.00 sec)
+
+mysql> select eid, max(cruisingrange) from aircraft, employees where eid in (select eid from certified group by eid having count(eid) > 3);
++-----+--------------------+
+| eid | max(cruisingrange) |
++-----+--------------------+
+|   1 |               8000 |
++-----+--------------------+
+1 row in set (0.00 sec)
+
+mysql> 
