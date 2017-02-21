@@ -1,0 +1,481 @@
+mysql> SELECT Fname, Lname FROM EMPLOYEE WHERE EMPLOYEE.Super_ssn IS NULL;
++-------+-------+
+| Fname | Lname |
++-------+-------+
+| James | Borg  |
++-------+-------+
+1 row in set (0.00 sec)
+
+mysql> SELECT DISTINCT Pnumber FROM PROJECT
+    -> WHERE Pnumber IN
+    -> (SELECT Pnumber FROM PROJECT, DEPARTMENT, EMPLOYEE
+    -> WHERE Dnum=Dnumber AND Mgr_ssn = Ssn AND Lname = 'Smith')
+    -> OR 
+    -> Pnumber IN
+    -> (SELECT Pno FROM WORKS_ON , EMPLOYEE
+    -> WHERE Essn = Ssn AND Lname = 'Smith');
++---------+
+| Pnumber |
++---------+
+|       1 |
+|       2 |
++---------+
+2 rows in set (0.00 sec)
+
+mysql> SELECT Essn FROM WORKS_ON WHERE (Pno,Hours) IN (SELECT Pno,Hours FROM WORKS_ON WHERE Essn = '123456789');
++-----------+
+| Essn      |
++-----------+
+| 123456789 |
+| 123456789 |
++-----------+
+2 rows in set (0.00 sec)
+
+mysql> SELECT Fname , Lname FROM EMPLOYEE WHERE Salary > ALL (SELECT Salary FROM EMPLOYEE WHERE Dno = 5);
++----------+---------+
+| Fname    | Lname   |
++----------+---------+
+| James    | Borg    |
+| Jennifer | Wallace |
++----------+---------+
+2 rows in set (0.00 sec)
+
+mysql> SELECT Fname , Lname FROM EMPLOYEE WHERE NOT EXISTS (SELECT * FROM DEPENDENT WHERE Ssn = Essn );
++--------+---------+
+| Fname  | Lname   |
++--------+---------+
+| Joyce  | English |
+| Ramesh | Narayan |
+| James  | Borg    |
+| Ahmad  | Jabbar  |
+| Alicia | Zelaya  |
++--------+---------+
+5 rows in set (0.00 sec)
+
+mysql> SELECT Fname , Lname FROM EMPLOYEE WHERE Ssn IN (SELECT Mgr_ssn FROM DEPARTMENT) AND EXISTS (SELECT * FROM DEPENDENT WHERE Essn = Ssn );
++----------+---------+
+| Fname    | Lname   |
++----------+---------+
+| Franklin | Wong    |
+| Jennifer | Wallace |
++----------+---------+
+2 rows in set (0.00 sec)
+
+
+mysql> SELECT DISTINCT Essn FROM WORKS_ON WHERE Pno IN (1,2,3);
++-----------+
+| Essn      |
++-----------+
+| 123456789 |
+| 453453453 |
+| 333445555 |
+| 666884444 |
++-----------+
+4 rows in set (0.00 sec)
+
+mysql> SELECT Fname , Lname , Address FROM (EMPLOYEE JOIN DEPARTMENT ON Dno = Dnumber) WHERE Dname = 'Research';
++----------+---------+--------------------------+
+| Fname    | Lname   | Address                  |
++----------+---------+--------------------------+
+| John     | Smith   | 731 Fondren, Houston, TX |
+| Franklin | Wong    | 638 Voss, Houston, TX    |
+| Joyce    | English | 5631 Rice, Houston, TX   |
+| Ramesh   | Narayan | 975 Fire Oak, Humble, TX |
++----------+---------+--------------------------+
+4 rows in set (0.00 sec)
+
+mysql> SELECT Fname , Lname , Address FROM (EMPLOYEE NATURAL JOIN (SELECT Dnumber AS Dno, Dname, Mgr_ssn , Mgr_start_date FROM DEPARTMENT) AS DEPT) WHERE Dname = 'Research';
++----------+---------+--------------------------+
+| Fname    | Lname   | Address                  |
++----------+---------+--------------------------+
+| John     | Smith   | 731 Fondren, Houston, TX |
+| Franklin | Wong    | 638 Voss, Houston, TX    |
+| Joyce    | English | 5631 Rice, Houston, TX   |
+| Ramesh   | Narayan | 975 Fire Oak, Humble, TX |
++----------+---------+--------------------------+
+4 rows in set (0.00 sec)
+
+mysql> SELECT E.Lname, S.Lname FROM (EMPLOYEE E LEFT OUTER JOIN EMPLOYEE S ON E.Super_ssn=S.Ssn);
++---------+---------+
+| Lname   | Lname   |
++---------+---------+
+| Smith   | Wong    |
+| Wong    | Borg    |
+| English | Wong    |
+| Narayan | Wong    |
+| Borg    | NULL    |
+| Wallace | Borg    |
+| Jabbar  | Wallace |
+| Zelaya  | Wallace |
++---------+---------+
+8 rows in set (0.00 sec)
+
+mysql> SELECT Pnumber, Dnum, Lname , Address , Bdate FROM ((PROJECT JOIN DEPARTMENT ON Dnum = Dnumber) JOIN EMPLOYEE ON Mgr_ssn = Ssn) WHERE Plocation = 'Stafford';
++---------+------+---------+-------------------------+------------+
+| Pnumber | Dnum | Lname   | Address                 | Bdate      |
++---------+------+---------+-------------------------+------------+
+|      10 |    4 | Wallace | 291 Berry, Bellaire, TX | 1941-06-20 |
+|      30 |    4 | Wallace | 291 Berry, Bellaire, TX | 1941-06-20 |
++---------+------+---------+-------------------------+------------+
+2 rows in set (0.00 sec)
+
+mysql> SELECT SUM(Salary), AVG(Salary), MAX(Salary ), MIN(Salary ) FROM EMPLOYEE;
++-------------+--------------+--------------+--------------+
+| SUM(Salary) | AVG(Salary)  | MAX(Salary ) | MIN(Salary ) |
++-------------+--------------+--------------+--------------+
+|   297500.00 | 37187.500000 |     71500.00 |     25000.00 |
++-------------+--------------+--------------+--------------+
+1 row in set (0.02 sec)
+
+mysql> SELECT SUM(Salary), AVG(Salary), MAX(Salary ), MIN(Salary ) FROM (EMPLOYEE JOIN DEPARTMENT ON Dno = Dnumber ) WHERE Dname = 'Research';
++-------------+--------------+--------------+--------------+
+| SUM(Salary) | AVG(Salary)  | MAX(Salary ) | MIN(Salary ) |
++-------------+--------------+--------------+--------------+
+|   133000.00 | 33250.000000 |     40000.00 |     25000.00 |
++-------------+--------------+--------------+--------------+
+1 row in set (0.00 sec)
+
+mysql> SELECT COUNT(*) FROM EMPLOYEE;
++----------+
+| COUNT(*) |
++----------+
+|        8 |
++----------+
+1 row in set (0.00 sec)
+
+mysql> SELECT COUNT(*) FROM EMPLOYEE, DEPARTMENT WHERE Dno=Dnumber AND Dname = 'Research';
++----------+
+| COUNT(*) |
++----------+
+|        4 |
++----------+
+1 row in set (0.00 sec)
+
+mysql> SELECT COUNT(DISTINCT Salary ) FROM EMPLOYEE;
++-------------------------+
+| COUNT(DISTINCT Salary ) |
++-------------------------+
+|                       6 |
++-------------------------+
+1 row in set (0.00 sec)
+
+mysql> SELECT Fname , Lname FROM EMPLOYEE WHERE (SELECT COUNT(*) FROM DEPENDENT WHERE Essn = Ssn)>=2;
++----------+-------+
+| Fname    | Lname |
++----------+-------+
+| John     | Smith |
+| Franklin | Wong  |
++----------+-------+
+2 rows in set (0.00 sec)
+
+mysql> SELECT Dno, COUNT(*), AVG(Salary ) FROM EMPLOYEE GROUP BY Dno;
++-----+----------+--------------+
+| Dno | COUNT(*) | AVG(Salary ) |
++-----+----------+--------------+
+|   1 |        1 | 71500.000000 |
+|   4 |        3 | 31000.000000 |
+|   5 |        4 | 33250.000000 |
++-----+----------+--------------+
+3 rows in set (0.00 sec)
+
+mysql> SELECT Pnumber , Pname , COUNT(*) FROM WORKS_ON, PROJECT WHERE Pnumber = Pno GROUP BY Pnumber , Pname ;
++---------+-----------------+----------+
+| Pnumber | Pname           | COUNT(*) |
++---------+-----------------+----------+
+|       1 | ProductX        |        2 |
+|       2 | ProductY        |        3 |
+|       3 | ProductZ        |        2 |
+|      10 | Computerization |        3 |
+|      20 | Reorganization  |        3 |
+|      30 | Newbenefits     |        3 |
++---------+-----------------+----------+
+6 rows in set (0.00 sec)
+
+mysql> SELECT Pnumber , Pname , COUNT(*) FROM WORKS_ON, PROJECT WHERE Pnumber = Pno GROUP BY Pnumber , Pname HAVING COUNT(*)>2;
++---------+-----------------+----------+
+| Pnumber | Pname           | COUNT(*) |
++---------+-----------------+----------+
+|       2 | ProductY        |        3 |
+|      10 | Computerization |        3 |
+|      20 | Reorganization  |        3 |
+|      30 | Newbenefits     |        3 |
++---------+-----------------+----------+
+4 rows in set (0.00 sec)
+
+mysql> SELECT Pnumber , Pname , COUNT(*) FROM EMPLOYEE, PROJECT, WORKS_ON WHERE Pno=Pnumber and Dno = 5 AND Essn =Ssn GROUP BY Pnumber , Pname ;
++---------+-----------------+----------+
+| Pnumber | Pname           | COUNT(*) |
++---------+-----------------+----------+
+|       1 | ProductX        |        2 |
+|       2 | ProductY        |        3 |
+|       3 | ProductZ        |        2 |
+|      10 | Computerization |        1 |
+|      20 | Reorganization  |        1 |
++---------+-----------------+----------+
+5 rows in set (0.00 sec)
+
+mysql> SELECT Dnumber , COUNT(*) FROM DEPARTMENT, EMPLOYEE WHERE Dno = Dnumber AND Salary > 40000 AND Dnumber IN (SELECT Dno FROM EMPLOYEE GROUP BY Dno HAVING COUNT(*)>5) GROUP BY Dnumber;
+Empty set (0.00 sec)
+
+mysql> SELECT Dnumber , COUNT(*) FROM DEPARTMENT, EMPLOYEE WHERE Dno = Dnumber AND Salary > 40000 AND Dnumber IN (SELECT Dno FROM EMPLOYEE GROUP BY Dno HAVING COUNT(*)>1) GROUP BY Dnumber;
++---------+----------+
+| Dnumber | COUNT(*) |
++---------+----------+
+|       4 |        1 |
++---------+----------+
+1 row in set (0.01 sec)
+
+mysql> SELECT Dnumber , COUNT(*) FROM DEPARTMENT, EMPLOYEE WHERE Dno = Dnumber AND Salary > 10000 AND Dnumber IN (SELECT Dno FROM EMPLOYEE GROUP BY Dno HAVING COUNT(*)>0) GROUP BY Dnumber;
++---------+----------+
+| Dnumber | COUNT(*) |
++---------+----------+
+|       1 |        1 |
+|       4 |        3 |
+|       5 |        4 |
++---------+----------+
+3 rows in set (0.00 sec)
+
+mysql> CREATE VIEW WORKS_ON1 AS SELECT Fname , Lname , Pname , Hours FROM EMPLOYEE, WORKS_ON, PROJECT WHERE Essn = Ssn AND Pno = Pnumber ;
+Query OK, 0 rows affected (0.04 sec)
+
+mysql> SELECT * FROM WORKS_ON1;
++----------+---------+-----------------+-------+
+| Fname    | Lname   | Pname           | Hours |
++----------+---------+-----------------+-------+
+| Franklin | Wong    | Computerization |  10.0 |
+| Ahmad    | Jabbar  | Computerization |  35.0 |
+| Alicia   | Zelaya  | Computerization |  10.0 |
+| Jennifer | Wallace | Newbenefits     |  20.0 |
+| Ahmad    | Jabbar  | Newbenefits     |   5.0 |
+| Alicia   | Zelaya  | Newbenefits     |  30.0 |
+| John     | Smith   | ProductX        |  32.5 |
+| Joyce    | English | ProductX        |  20.0 |
+| John     | Smith   | ProductY        |   7.5 |
+| Franklin | Wong    | ProductY        |  10.0 |
+| Joyce    | English | ProductY        |  20.0 |
+| Franklin | Wong    | ProductZ        |  10.0 |
+| Ramesh   | Narayan | ProductZ        |  40.0 |
+| Franklin | Wong    | Reorganization  |  10.0 |
+| James    | Borg    | Reorganization  |   0.0 |
+| Jennifer | Wallace | Reorganization  |  15.0 |
++----------+---------+-----------------+-------+
+16 rows in set (0.00 sec)
+
+mysql> CREATE VIEW DEPT_INFO(Dept_name, No_of_emps, Total_sal) AS SELECT Dname , COUNT(*), SUM(Salary ) FROM DEPARTMENT , EMPLOYEE WHERE Dno=Dnumber GROUP BY Dname ;
+Query OK, 0 rows affected (0.03 sec)
+
+mysql> SELECT * FROM DEPT_INFO;
++----------------+------------+-----------+
+| Dept_name      | No_of_emps | Total_sal |
++----------------+------------+-----------+
+| Administration |          3 |  93000.00 |
+| Headquarters   |          1 |  71500.00 |
+| Research       |          4 | 133000.00 |
++----------------+------------+-----------+
+3 rows in set (0.00 sec)
+
+mysql> SELECT Fname , Lname FROM WORKS_ON1 WHERE Pname = 'ProductX';
++-------+---------+
+| Fname | Lname   |
++-------+---------+
+| John  | Smith   |
+| Joyce | English |
++-------+---------+
+2 rows in set (0.00 sec)
+
+mysql> ALTER TABLE EMPLOYEE ADD COLUMN Job VARCHAR(12);
+Query OK, 0 rows affected (1.03 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> ALTER TABLE EMPLOYEE ALTER COLUMN Job SET DEFAULT 'XYZ';
+Query OK, 0 rows affected (0.07 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> SELECT * FROM EMPLOYEE;
++----------+-------+---------+-----------+------------+--------------------------+------+----------+-----------+-----+------------+------+
+| Fname    | Minit | Lname   | Ssn       | Bdate      | Address                  | Sex  | Salary   | Super_ssn | Dno | Mobile_No  | Job  |
++----------+-------+---------+-----------+------------+--------------------------+------+----------+-----------+-----+------------+------+
+| John     | B     | Smith   | 123456789 | 1965-01-09 | 731 Fondren, Houston, TX | M    | 30000.00 | 333445555 |   5 | 0000000000 | NULL |
+| Franklin | T     | Wong    | 333445555 | 1955-12-08 | 638 Voss, Houston, TX    | M    | 40000.00 | 888665555 |   5 | 0000000000 | NULL |
+| Joyce    | A     | English | 453453453 | 1972-07-31 | 5631 Rice, Houston, TX   | F    | 25000.00 | 333445555 |   5 | 0000000000 | NULL |
+| Ramesh   | K     | Narayan | 666884444 | 1962-09-15 | 975 Fire Oak, Humble, TX | M    | 38000.00 | 333445555 |   5 | 0000000000 | NULL |
+| James    | E     | Borg    | 888665555 | 1937-11-10 | 450 Stone, Houston, TX   | M    | 71500.00 | NULL      |   1 | 0000000000 | NULL |
+| Jennifer | S     | Wallace | 987654321 | 1941-06-20 | 291 Berry, Bellaire, TX  | F    | 43000.00 | 888665555 |   4 | 0000000000 | NULL |
+| Ahmad    | V     | Jabbar  | 987987987 | 1969-03-29 | 980 Dallas, Houston, TX  | M    | 25000.00 | 987654321 |   4 | 0000000000 | NULL |
+| Alicia   | J     | Zelaya  | 999887777 | 1968-01-19 | 3321 Castle, Spring, TX  | F    | 25000.00 | 987654321 |   4 | 0000000000 | NULL |
++----------+-------+---------+-----------+------------+--------------------------+------+----------+-----------+-----+------------+------+
+8 rows in set (0.00 sec)
+
+mysql> ALTER TABLE EMPLOYEE ALTER COLUMN Job DROP DEFAULT;
+Query OK, 0 rows affected (0.07 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> SELECT Dname , COUNT(*) FROM DEPARTMENT, EMPLOYEE WHERE Dno=Dnumber GROUP BY Dname HAVING AVG(Salary )>30000;
++----------------+----------+
+| Dname          | COUNT(*) |
++----------------+----------+
+| Administration |        3 |
+| Headquarters   |        1 |
+| Research       |        4 |
++----------------+----------+
+3 rows in set (0.00 sec)
+
+mysql> SELECT Dname , COUNT(*) FROM DEPARTMENT D, EMPLOYEE F WHERE D.Dnumber = F.Dno  GROUP BY D.Dname;
++----------------+----------+
+| Dname          | COUNT(*) |
++----------------+----------+
+| Administration |        3 |
+| Headquarters   |        1 |
+| Research       |        4 |
++----------------+----------+
+3 rows in set (0.01 sec)
+
+mysql> SELECT Dname, COUNT(*) FROM DEPARTMENT D, EMPLOYEE E WHERE D.Dnumber IN (SELECT D1.Dnumber FROM DEPARTMENT D1,EMPLOYEE E1 WHERE D1.Dnumber = E1.Dno GROUP BY D1.Dnumber HAVING AVG(Salary)>30000) AND D.Dnumber = E.Dno AND E.Sex = 'M' GROUP BY D.Dname;
++----------------+----------+
+| Dname          | COUNT(*) |
++----------------+----------+
+| Administration |        1 |
+| Headquarters   |        1 |
+| Research       |        3 |
++----------------+----------+
+3 rows in set (0.00 sec)
+
+mysql> SELECT E.Fname , E.Minit , E.Lname FROM EMPLOYEE E WHERE E.Dno IN (SELECT E1.Dno FROM EMPLOYEE E1 WHERE E1.Salary = (SELECT MAX(E2.Salary) FROM EMPLOYEE E2));
++-------+-------+-------+
+| Fname | Minit | Lname |
++-------+-------+-------+
+| James | E     | Borg  |
++-------+-------+-------+
+1 row in set (0.00 sec)
+
+mysql> SELECT E.Fname, E.Minit , E.Lname FROM EMPLOYEE E WHERE E.Super_ssn IN (SELECT E1.Ssn FROM EMPLOYEE E1 WHERE E1.Super_ssn = '888665555');
++--------+-------+---------+
+| Fname  | Minit | Lname   |
++--------+-------+---------+
+| John   | B     | Smith   |
+| Joyce  | A     | English |
+| Ramesh | K     | Narayan |
+| Ahmad  | V     | Jabbar  |
+| Alicia | J     | Zelaya  |
++--------+-------+---------+
+5 rows in set (0.00 sec)
+
+mysql> SELECT E.Fname, E.Minit , E.Lname FROM EMPLOYEE E WHERE E.Salary >=10000+ (SELECT MIN(E1.Salary) FROM EMPLOYEE E1);
++----------+-------+---------+
+| Fname    | Minit | Lname   |
++----------+-------+---------+
+| Franklin | T     | Wong    |
+| Ramesh   | K     | Narayan |
+| James    | E     | Borg    |
+| Jennifer | S     | Wallace |
++----------+-------+---------+
+4 rows in set (0.00 sec)
+
+mysql> CREATE VIEW V1(Dept_name, Manager_name, Manager_salary)
+    -> AS
+    -> SELECT D.Dname, E.Lname, E.Salary FROM DEPARTMENT D, EMPLOYEE E WHERE D.Mgr_ssn = E.Ssn;
+Query OK, 0 rows affected (0.07 sec)
+
+mysql> SELECT * FROM V1;
++----------------+--------------+----------------+
+| Dept_name      | Manager_name | Manager_salary |
++----------------+--------------+----------------+
+| Headquarters   | Borg         |       71500.00 |
+| Administration | Wallace      |       43000.00 |
+| Research       | Wong         |       40000.00 |
++----------------+--------------+----------------+
+3 rows in set (0.00 sec)
+
+mysql> CREATE VIEW V2(Employee_name, Supervisor_name, Employee_salary) AS SELECT E.Lname, S.Lname, E.Salary FROM EMPLOYEE E, EMPLOYEE S, DEPARTMENT D WHERE S.Ssn=E.Super_ssn AND E.Dno = D.Dnumber AND D.Dname = 'Research';
+Query OK, 0 rows affected (0.06 sec)
+
+mysql> SELECT * FROM V2;
++---------------+-----------------+-----------------+
+| Employee_name | Supervisor_name | Employee_salary |
++---------------+-----------------+-----------------+
+| Smith         | Wong            |        30000.00 |
+| Wong          | Borg            |        40000.00 |
+| English       | Wong            |        25000.00 |
+| Narayan       | Wong            |        38000.00 |
++---------------+-----------------+-----------------+
+4 rows in set (0.01 sec)
+
+mysql> CREATE VIEW V3(Project_name, Dept_name, Num_of_emp, Total_hours) AS SELECT P.Pname, D.Dname, COUNT(*), SUM(W.Hours) FROM PROJECT P, DEPARTMENT D, WORKS_ON W WHERE P.Dnum = D.Dnumber AND P.Pnumber = W.Pno GROUP BY P.Pname;
+Query OK, 0 rows affected (0.07 sec)
+
+mysql> SELECT * FROM V3;
++-----------------+----------------+------------+-------------+
+| Project_name    | Dept_name      | Num_of_emp | Total_hours |
++-----------------+----------------+------------+-------------+
+| Computerization | Administration |          3 |        55.0 |
+| Newbenefits     | Administration |          3 |        55.0 |
+| ProductX        | Research       |          2 |        52.5 |
+| ProductY        | Research       |          3 |        37.5 |
+| ProductZ        | Research       |          2 |        50.0 |
+| Reorganization  | Headquarters   |          3 |        25.0 |
++-----------------+----------------+------------+-------------+
+6 rows in set (0.00 sec)
+
+mysql> CREATE VIEW P3(Project_name, Dept_name, Num_of_emp, Total_hours) AS SELECT P.Pname, D.Dname, COUNT(*), SUM(W.Hours) FROM PROJECT P, DEPARTMENT D, WORKS_ON W WHERE P.Dnum = D.Dnumber AND P.Pnumber = W.Pno GROUP BY P.Pname HAVING COUNT(*)>2;
+Query OK, 0 rows affected (0.09 sec)
+
+mysql> SELECT * FROM P3;
++-----------------+----------------+------------+-------------+
+| Project_name    | Dept_name      | Num_of_emp | Total_hours |
++-----------------+----------------+------------+-------------+
+| Computerization | Administration |          3 |        55.0 |
+| Newbenefits     | Administration |          3 |        55.0 |
+| ProductY        | Research       |          3 |        37.5 |
+| Reorganization  | Headquarters   |          3 |        25.0 |
++-----------------+----------------+------------+-------------+
+4 rows in set (0.00 sec)
+
+mysql> CREATE VIEW V4(Project_name, Dept_name, Num_of_emp, Total_hours) AS SELECT P.Pname, D.Dname, COUNT(*), SUM(W.Hours) FROM PROJECT P, DEPARTMENT D, WORKS_ON W WHERE P.Dnum = D.Dnumber AND P.Pnumber = W.Pno GROUP BY P.Pname HAVING COUNT(*)>1;
+Query OK, 0 rows affected (0.08 sec)
+
+mysql> SELECT * FROM V4;
++-----------------+----------------+------------+-------------+
+| Project_name    | Dept_name      | Num_of_emp | Total_hours |
++-----------------+----------------+------------+-------------+
+| Computerization | Administration |          3 |        55.0 |
+| Newbenefits     | Administration |          3 |        55.0 |
+| ProductX        | Research       |          2 |        52.5 |
+| ProductY        | Research       |          3 |        37.5 |
+| ProductZ        | Research       |          2 |        50.0 |
+| Reorganization  | Headquarters   |          3 |        25.0 |
++-----------------+----------------+------------+-------------+
+6 rows in set (0.00 sec)
+
+mysql> CREATE VIEW DEPT_SUMMARY(D,C,Total_s, Average_s) AS SELECT Dno,COUNT(*),SUM(Salary),AVG(Salary) FROM EMPLOYEE GROUP BY Dno;
+Query OK, 0 rows affected (0.06 sec)
+
+mysql> SELECT * FROM DEPT_SUMMARY;
++---+---+-----------+--------------+
+| D | C | Total_s   | Average_s    |
++---+---+-----------+--------------+
+| 1 | 1 |  71500.00 | 71500.000000 |
+| 4 | 3 |  93000.00 | 31000.000000 |
+| 5 | 4 | 133000.00 | 33250.000000 |
++---+---+-----------+--------------+
+3 rows in set (0.00 sec)
+
+mysql> SELECT D,C FROM DEPT_SUMMARY WHERE Total_s >100000;
++---+---+
+| D | C |
++---+---+
+| 5 | 4 |
++---+---+
+1 row in set (0.00 sec)
+
+mysql> SELECT D,Average_s FROM DEPT_SUMMARY WHERE C>(SELECT C FROM DEPT_SUMMARY WHERE D=4);
++---+--------------+
+| D | Average_s    |
++---+--------------+
+| 5 | 33250.000000 |
++---+--------------+
+1 row in set (0.00 sec)
+
+mysql> UPDATE DEPT_SUMMARY SET D=3 WHERE D=4;
+ERROR 1288 (HY000): The target table DEPT_SUMMARY of the UPDATE is not updatable
+mysql> DELETE FROM DEPT_SUMMARY WHERE C>4;
+ERROR 1288 (HY000): The target table DEPT_SUMMARY of the DELETE is not updatable

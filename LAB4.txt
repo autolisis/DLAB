@@ -1,0 +1,319 @@
+mysql> SELECT Fname, Minit, Lname FROM EMPLOYEE E, WORKS_ON W , PROJECT P WHERE E.Ssn = W.Essn AND W.Hours > 10 AND W.Pno = P.Pnumber AND P.Pname LIKE '%X';
++-------+-------+---------+
+| Fname | Minit | Lname   |
++-------+-------+---------+
+| John  | B     | Smith   |
+| Joyce | A     | English |
++-------+-------+---------+
+2 rows in set (0.00 sec)
+
+mysql> SELECT Fname, Minit, Lname FROM EMPLOYEE E, DEPENDENT D WHERE E.Ssn = D.Essn AND E.Fname = D.Dependent_name;
+Empty set (0.00 sec)
+
+mysql> SELECT E.Fname, E.Minit, E.Lname FROM EMPLOYEE E, EMPLOYEE D WHERE E.Super_ssn = D.Ssn AND D.Fname LIKE 'Franklin' AND D.Lname LIKE 'Wong';
++--------+-------+---------+
+| Fname  | Minit | Lname   |
++--------+-------+---------+
+| John   | B     | Smith   |
+| Joyce  | A     | English |
+| Ramesh | K     | Narayan |
++--------+-------+---------+
+3 rows in set (0.00 sec)
+
+mysql> Ctrl-C -- exit!
+Aborted
+mysql> select Dname, count(*) from EMPLOYEE e, DEPARTMENT d where 30000 < (select avg(Salary) from EMPLOYEE where e.Dno = d.Dnumber) group by Dname;
++----------------+----------+
+| Dname          | count(*) |
++----------------+----------+
+| Administration |        3 |
+| Headquarters   |        1 |
+| Research       |        4 |
++----------------+----------+
+3 rows in set (0.00 sec)
+
+mysql> SELECT * FROM EMPLOYEE;
++----------+-------+---------+-----------+------------+--------------------------+------+----------+-----------+-----+------------+
+| Fname    | Minit | Lname   | Ssn       | Bdate      | Address                  | Sex  | Salary   | Super_ssn | Dno | Mobile_No  |
++----------+-------+---------+-----------+------------+--------------------------+------+----------+-----------+-----+------------+
+| John     | B     | Smith   | 123456789 | 1965-01-09 | 731 Fondren, Houston, TX | M    | 30000.00 | 333445555 |   5 | 0000000000 |
+| Franklin | T     | Wong    | 333445555 | 1955-12-08 | 638 Voss, Houston, TX    | M    | 40000.00 | 888665555 |   5 | 0000000000 |
+| Joyce    | A     | English | 453453453 | 1972-07-31 | 5631 Rice, Houston, TX   | F    | 25000.00 | 333445555 |   5 | 0000000000 |
+| Ramesh   | K     | Narayan | 666884444 | 1962-09-15 | 975 Fire Oak, Humble, TX | M    | 38000.00 | 333445555 |   5 | 0000000000 |
+| James    | E     | Borg    | 888665555 | 1937-11-10 | 450 Stone, Houston, TX   | M    | 71500.00 | NULL      |   1 | 0000000000 |
+| Jennifer | S     | Wallace | 987654321 | 1941-06-20 | 291 Berry, Bellaire, TX  | F    | 43000.00 | 888665555 |   4 | 0000000000 |
+| Ahmad    | V     | Jabbar  | 987987987 | 1969-03-29 | 980 Dallas, Houston, TX  | M    | 25000.00 | 987654321 |   4 | 0000000000 |
+| Alicia   | J     | Zelaya  | 999887777 | 1968-01-19 | 3321 Castle, Spring, TX  | F    | 25000.00 | 987654321 |   4 | 0000000000 |
++----------+-------+---------+-----------+------------+--------------------------+------+----------+-----------+-----+------------+
+8 rows in set (0.00 sec)
+
+mysql> SELECT * FROM EMPLOYEE GROUP BY Dno;
++----------+-------+---------+-----------+------------+--------------------------+------+----------+-----------+-----+------------+
+| Fname    | Minit | Lname   | Ssn       | Bdate      | Address                  | Sex  | Salary   | Super_ssn | Dno | Mobile_No  |
++----------+-------+---------+-----------+------------+--------------------------+------+----------+-----------+-----+------------+
+| James    | E     | Borg    | 888665555 | 1937-11-10 | 450 Stone, Houston, TX   | M    | 71500.00 | NULL      |   1 | 0000000000 |
+| Jennifer | S     | Wallace | 987654321 | 1941-06-20 | 291 Berry, Bellaire, TX  | F    | 43000.00 | 888665555 |   4 | 0000000000 |
+| John     | B     | Smith   | 123456789 | 1965-01-09 | 731 Fondren, Houston, TX | M    | 30000.00 | 333445555 |   5 | 0000000000 |
++----------+-------+---------+-----------+------------+--------------------------+------+----------+-----------+-----+------------+
+3 rows in set (0.00 sec)
+
+mysql> SELECT avg(Salary)  FROM EMPLOYEE GROUP BY Dno;
++--------------+
+| avg(Salary)  |
++--------------+
+| 71500.000000 |
+| 31000.000000 |
+| 33250.000000 |
++--------------+
+3 rows in set (0.00 sec)
+
+mysql> select Dname, count(*) from EMPLOYEE e, DEPARTMENT d where 40000 < (select avg(Salary) from EMPLOYEE where e.Dno = d.Dnumber) group by Dname;
+Empty set (0.00 sec)
+
+mysql> select Dname, count(*) from EMPLOYEE e, DEPARTMENT d where 30000 < (select avg(Salary) from EMPLOYEE where e.Dno = d.Dnumber) group by Dname;
++----------------+----------+
+| Dname          | count(*) |
++----------------+----------+
+| Administration |        3 |
+| Headquarters   |        1 |
+| Research       |        4 |
++----------------+----------+
+3 rows in set (0.00 sec)
+
+mysql> select Dname, count(*) from EMPLOYEE e, DEPARTMENT d where 30000 < (select avg(Salary) from EMPLOYEE where e.Dno = d.Dnumber) group by Dname;
++----------------+----------+
+| Dname          | count(*) |
++----------------+----------+
+| Administration |        3 |
+| Headquarters   |        1 |
+| Research       |        4 |
++----------------+----------+
+3 rows in set (0.00 sec)
+
+mysql> select Dname, count(*) from EMPLOYEE e, DEPARTMENT d where 40000 < (select avg(Salary) from EMPLOYEE where e.Dno = d.Dnumber) group by Dname;
+Empty set (0.00 sec)
+
+mysql> select Dname, count(*) from EMPLOYEE e, DEPARTMENT d where 70000 < (select avg(Salary) from EMPLOYEE where e.Dno = d.Dnumber) group by Dname;
+Empty set (0.00 sec)
+
+mysql> select Dname, count(*) from EMPLOYEE e, DEPARTMENT d where 20000 < (select avg(Salary) from EMPLOYEE where e.Dno = d.Dnumber) group by Dname;
++----------------+----------+
+| Dname          | count(*) |
++----------------+----------+
+| Administration |        3 |
+| Headquarters   |        1 |
+| Research       |        4 |
++----------------+----------+
+3 rows in set (0.00 sec)
+
+mysql> select Dname, count(*) from EMPLOYEE e, DEPARTMENT d where 30000 < (select avg(Salary) from EMPLOYEE where e.Dno = d.Dnumber) group by Dname;
++----------------+----------+
+| Dname          | count(*) |
++----------------+----------+
+| Administration |        3 |
+| Headquarters   |        1 |
+| Research       |        4 |
++----------------+----------+
+3 rows in set (0.00 sec)
+
+mysql> select Dname, count(*) from EMPLOYEE e, DEPARTMENT d where 35000 < (select avg(Salary) from EMPLOYEE where e.Dno = d.Dnumber) group by Dname;
++----------------+----------+
+| Dname          | count(*) |
++----------------+----------+
+| Administration |        3 |
+| Headquarters   |        1 |
+| Research       |        4 |
++----------------+----------+
+3 rows in set (0.00 sec)
+
+mysql> select Dname, count(*) from EMPLOYEE e, DEPARTMENT d where 30000 < (select avg(Salary) from EMPLOYEE where e.Dno = d.Dnumber group by Dno) group by Dname;
+mysql> select Dname, count(*) from EMPLOYEE e, DEPARTMENT d where 30000 < (select avg(Salary) from EMPLOYEE where e.Dno = d.Dnumber) group by Dname;
++----------------+----------+
+| Dname          | count(*) |
++----------------+----------+
+| Administration |        3 |
+| Headquarters   |        1 |
+| Research       |        4 |
++----------------+----------+
+3 rows in set (0.00 sec)
+
+mysql> select Dname, count(*) from EMPLOYEE e, DEPARTMENT d where 40000 < (select avg(Salary) from EMPLOYEE where e.Dno = d.Dnumber) group by Dname;
+Empty set (0.00 sec)
+
+mysql> select Dname, count(*) from EMPLOYEE e, DEPARTMENT d where group by Dname 40000 < (select avg(Salary) from EMPLOYEE where e.Dno = d.Dnumber);
+
+mysql> select Dname, count(*) from EMPLOYEE e, DEPARTMENT d group by Dname having 40000 < (select avg(Salary) from EMPLOYEE,DEPARTMENT where Dno = DEPARTMENT.Dnumber);
+Empty set (0.00 sec)
+
+mysql> select Dname, count(*) from EMPLOYEE e, DEPARTMENT d where 40000 < (select avg(Salary) from EMPLOYEE where e.Dno = d.Dnumber) group by Dname;
+Empty set (0.00 sec)
+
+mysql> select Dname, count(*) from EMPLOYEE e, DEPARTMENT d where 80000 >  (select avg(Salary) from EMPLOYEE where e.Dno = d.Dnumber) group by Dname;
++----------------+----------+
+| Dname          | count(*) |
++----------------+----------+
+| Administration |        3 |
+| Headquarters   |        1 |
+| Research       |        4 |
++----------------+----------+
+3 rows in set (0.00 sec)
+
+mysql> select Dname, count(*) from EMPLOYEE e, DEPARTMENT d where 50000 > (select avg(Salary) from EMPLOYEE where e.Dno = d.Dnumber) group by Dname;
++----------------+----------+
+| Dname          | count(*) |
++----------------+----------+
+| Administration |        3 |
+| Headquarters   |        1 |
+| Research       |        4 |
++----------------+----------+
+3 rows in set (0.00 sec)
+
+mysql> select Dname, count(*) from EMPLOYEE e, DEPARTMENT d where 50000 < (select avg(Salary) from EMPLOYEE where e.Dno = d.Dnumber) group by Dname;
+Empty set (0.00 sec)
+
+mysql> select Dname, count(*) from EMPLOYEE e, DEPARTMENT d where 50000 < (select avg(Salary) from EMPLOYEE where Dno = d.Dnumber) group by Dname;
++--------------+----------+
+| Dname        | count(*) |
++--------------+----------+
+| Headquarters |        8 |
++--------------+----------+
+1 row in set (0.00 sec)
+
+mysql> select Dname, count(*) from EMPLOYEE e, DEPARTMENT d where 30000 < (select avg(Salary) from EMPLOYEE where Dno = d.Dnumber) group by Dname;
++----------------+----------+
+| Dname          | count(*) |
++----------------+----------+
+| Administration |        8 |
+| Headquarters   |        8 |
+| Research       |        8 |
++----------------+----------+
+3 rows in set (0.00 sec)
+
+mysql> select Dname, count(*) from EMPLOYEE e, DEPARTMENT d where 40000 < (select avg(Salary) from EMPLOYEE where Dno = d.Dnumber) group by Dname;
++--------------+----------+
+| Dname        | count(*) |
++--------------+----------+
+| Headquarters |        8 |
++--------------+----------+
+1 row in set (0.00 sec)
+
+mysql> SELECT * FROM DEPARTMENT;
++----------------+---------+-----------+----------------+
+| Dname          | Dnumber | Mgr_ssn   | Mgr_start_date |
++----------------+---------+-----------+----------------+
+| Headquarters   |       1 | 888665555 | 1981-06-19     |
+| Administration |       4 | 987654321 | 1995-01-01     |
+| Research       |       5 | 333445555 | 1988-05-22     |
++----------------+---------+-----------+----------------+
+3 rows in set (0.00 sec)
+
+mysql> select Dname, count(*) from EMPLOYEE e, DEPARTMENT d where 40000 < (select avg(Salary) from EMPLOYEE where Dno = d.Dnumber) AND d.Dnumber = e.Dno group by Dname;
++--------------+----------+
+| Dname        | count(*) |
++--------------+----------+
+| Headquarters |        1 |
++--------------+----------+
+1 row in set (0.00 sec)
+
+mysql> select Dname, count(*) from EMPLOYEE e, DEPARTMENT d where e.Dno=d.Dnumber AND sex='M' AND e.Salary>30000 group by Dname;
++--------------+----------+
+| Dname        | count(*) |
++--------------+----------+
+| Headquarters |        1 |
+| Research     |        2 |
++--------------+----------+
+2 rows in set (0.00 sec)
+
+mysql> select * from EMPLOYEE;
++----------+-------+---------+-----------+------------+--------------------------+------+----------+-----------+-----+------------+
+| Fname    | Minit | Lname   | Ssn       | Bdate      | Address                  | Sex  | Salary   | Super_ssn | Dno | Mobile_No  |
++----------+-------+---------+-----------+------------+--------------------------+------+----------+-----------+-----+------------+
+| John     | B     | Smith   | 123456789 | 1965-01-09 | 731 Fondren, Houston, TX | M    | 30000.00 | 333445555 |   5 | 0000000000 |
+| Franklin | T     | Wong    | 333445555 | 1955-12-08 | 638 Voss, Houston, TX    | M    | 40000.00 | 888665555 |   5 | 0000000000 |
+| Joyce    | A     | English | 453453453 | 1972-07-31 | 5631 Rice, Houston, TX   | F    | 25000.00 | 333445555 |   5 | 0000000000 |
+| Ramesh   | K     | Narayan | 666884444 | 1962-09-15 | 975 Fire Oak, Humble, TX | M    | 38000.00 | 333445555 |   5 | 0000000000 |
+| James    | E     | Borg    | 888665555 | 1937-11-10 | 450 Stone, Houston, TX   | M    | 71500.00 | NULL      |   1 | 0000000000 |
+| Jennifer | S     | Wallace | 987654321 | 1941-06-20 | 291 Berry, Bellaire, TX  | F    | 43000.00 | 888665555 |   4 | 0000000000 |
+| Ahmad    | V     | Jabbar  | 987987987 | 1969-03-29 | 980 Dallas, Houston, TX  | M    | 25000.00 | 987654321 |   4 | 0000000000 |
+| Alicia   | J     | Zelaya  | 999887777 | 1968-01-19 | 3321 Castle, Spring, TX  | F    | 25000.00 | 987654321 |   4 | 0000000000 |
++----------+-------+---------+-----------+------------+--------------------------+------+----------+-----------+-----+------------+
+8 rows in set (0.00 sec)
+
+mysql> select * from EMPLOYEE WHERE Sex = 'M' and Salary>30000;
++----------+-------+---------+-----------+------------+--------------------------+------+----------+-----------+-----+------------+
+| Fname    | Minit | Lname   | Ssn       | Bdate      | Address                  | Sex  | Salary   | Super_ssn | Dno | Mobile_No  |
++----------+-------+---------+-----------+------------+--------------------------+------+----------+-----------+-----+------------+
+| Franklin | T     | Wong    | 333445555 | 1955-12-08 | 638 Voss, Houston, TX    | M    | 40000.00 | 888665555 |   5 | 0000000000 |
+| Ramesh   | K     | Narayan | 666884444 | 1962-09-15 | 975 Fire Oak, Humble, TX | M    | 38000.00 | 333445555 |   5 | 0000000000 |
+| James    | E     | Borg    | 888665555 | 1937-11-10 | 450 Stone, Houston, TX   | M    | 71500.00 | NULL      |   1 | 0000000000 |
++----------+-------+---------+-----------+------------+--------------------------+------+----------+-----------+-----+------------+
+3 rows in set (0.00 sec)
+
+mysql> select Dname, count(*) from EMPLOYEE e, DEPARTMENT d where 30000 < (select avg(Salary) from EMPLOYEE where Dno = d.Dnumber) AND d.Dnumber = e.Dno and Sex = 'M' group by Dname;
++----------------+----------+
+| Dname          | count(*) |
++----------------+----------+
+| Administration |        1 |
+| Headquarters   |        1 |
+| Research       |        3 |
++----------------+----------+
+3 rows in set (0.00 sec)
+
+mysql> SELECT * FROM EMPLOYEE WHERE Sex = 'M';
++----------+-------+---------+-----------+------------+--------------------------+------+----------+-----------+-----+------------+
+| Fname    | Minit | Lname   | Ssn       | Bdate      | Address                  | Sex  | Salary   | Super_ssn | Dno | Mobile_No  |
++----------+-------+---------+-----------+------------+--------------------------+------+----------+-----------+-----+------------+
+| John     | B     | Smith   | 123456789 | 1965-01-09 | 731 Fondren, Houston, TX | M    | 30000.00 | 333445555 |   5 | 0000000000 |
+| Franklin | T     | Wong    | 333445555 | 1955-12-08 | 638 Voss, Houston, TX    | M    | 40000.00 | 888665555 |   5 | 0000000000 |
+| Ramesh   | K     | Narayan | 666884444 | 1962-09-15 | 975 Fire Oak, Humble, TX | M    | 38000.00 | 333445555 |   5 | 0000000000 |
+| James    | E     | Borg    | 888665555 | 1937-11-10 | 450 Stone, Houston, TX   | M    | 71500.00 | NULL      |   1 | 0000000000 |
+| Ahmad    | V     | Jabbar  | 987987987 | 1969-03-29 | 980 Dallas, Houston, TX  | M    | 25000.00 | 987654321 |   4 | 0000000000 |
++----------+-------+---------+-----------+------------+--------------------------+------+----------+-----------+-----+------------+
+5 rows in set (0.00 sec)
+
+mysql> SELECT Fname FROM EMPLOYEE e WHERE e.Dno IN (SELECT Dno FROM EMPLOYEE d WHERE d.Salary IN (SELECT max(Salary) FROM EMPLOYEE));
++-------+
+| Fname |
++-------+
+| James |
++-------+
+1 row in set (0.00 sec)
+
+mysql> SELECT * FROM EMPLOYEE;
++----------+-------+---------+-----------+------------+--------------------------+------+----------+-----------+-----+------------+
+| Fname    | Minit | Lname   | Ssn       | Bdate      | Address                  | Sex  | Salary   | Super_ssn | Dno | Mobile_No  |
++----------+-------+---------+-----------+------------+--------------------------+------+----------+-----------+-----+------------+
+| John     | B     | Smith   | 123456789 | 1965-01-09 | 731 Fondren, Houston, TX | M    | 30000.00 | 333445555 |   5 | 0000000000 |
+| Franklin | T     | Wong    | 333445555 | 1955-12-08 | 638 Voss, Houston, TX    | M    | 40000.00 | 888665555 |   5 | 0000000000 |
+| Joyce    | A     | English | 453453453 | 1972-07-31 | 5631 Rice, Houston, TX   | F    | 25000.00 | 333445555 |   5 | 0000000000 |
+| Ramesh   | K     | Narayan | 666884444 | 1962-09-15 | 975 Fire Oak, Humble, TX | M    | 38000.00 | 333445555 |   5 | 0000000000 |
+| James    | E     | Borg    | 888665555 | 1937-11-10 | 450 Stone, Houston, TX   | M    | 71500.00 | NULL      |   1 | 0000000000 |
+| Jennifer | S     | Wallace | 987654321 | 1941-06-20 | 291 Berry, Bellaire, TX  | F    | 43000.00 | 888665555 |   4 | 0000000000 |
+| Ahmad    | V     | Jabbar  | 987987987 | 1969-03-29 | 980 Dallas, Houston, TX  | M    | 25000.00 | 987654321 |   4 | 0000000000 |
+| Alicia   | J     | Zelaya  | 999887777 | 1968-01-19 | 3321 Castle, Spring, TX  | F    | 25000.00 | 987654321 |   4 | 0000000000 |
++----------+-------+---------+-----------+------------+--------------------------+------+----------+-----------+-----+------------+
+8 rows in set (0.00 sec)
+
+mysql> SELECT Fname FROM EMPLOYEE e WHERE e.Salary >= 10000 + (SELECT min(Salary) FROM EMPLOYEE);
++----------+
+| Fname    |
++----------+
+| Franklin |
+| Ramesh   |
+| James    |
+| Jennifer |
++----------+
+4 rows in set (0.00 sec)
+
+mysql> SELECT Fname FROM EMPLOYEE e, PROJECT p, WORKS_ON w WHERE e.Dno = 5 AND w.Pno = p.Pnumber AND p.Pname like '%X' AND w.Essn=e.Ssn AND w.Hours > 10;
++-------+
+| Fname |
++-------+
+| John  |
+| Joyce |
++-------+
+2 rows in set (0.00 sec)
+
+mysql> SELECT Fname FROM EMPLOYEE e WHERE  (SELECT count(Ssn) FROM EMPLOYEE d,PROJECT p, WORKS_ON w WHERE d.Ssn=e.Ssn AND w.Essn=d.Ssn AND w.Pno = p.Pnumber AND p.Dnum=5)= (SELECT count(Pnumber) FROM PROJECT p WHERE p.Dnum=5);  
+
+Empty set (0.00 sec)
