@@ -1,0 +1,831 @@
+mysql> /*1 a*/ set @row_no:=0; select * from emp where mod(@row_no:=@row_no+1,2)=1;
+Query OK, 0 rows affected (0.01 sec)
+
++----------+-------+---------+-----------+------------+--------------------------+------+--------+-----------+------+
+| Fname    | Minit | Lname   | Ssn       | Bdate      | Address                  | Sex  | Salary | Super_ssn | Dno  |
++----------+-------+---------+-----------+------------+--------------------------+------+--------+-----------+------+
+| John     | B     | Smith   | 123456789 | 1965-01-09 | 731 Fondren, Houston, TX | M    |   3000 | 333445555 |   12 |
+| Joyce    | A     | English | 453453453 | 1972-07-31 | 5631 Rice, Houston, TX   | F    |  12350 | 333445555 |   24 |
+| Evelyn   | H     | Mishra  | 684326513 | 1984-12-22 | 2122, Bellaire, TX       | F    |  50000 | 666884444 |   15 |
+| Jennifer | S     | Wallace | 987654321 | 1941-06-20 | 291 Berry, Bellaire, TX  | F    |  43000 | 888665555 |   10 |
+| Alicia   | J     | Zelaya  | 999887777 | 1968-01-19 | 3321 Castle, Spring, TX  | F    |  31500 | 987654321 |   10 |
++----------+-------+---------+-----------+------------+--------------------------+------+--------+-----------+------+
+5 rows in set (0.00 sec)
+
+mysql> /*1 b*/ set @row_no:=0; select * from emp where mod(@row_no:=@row_no+1,2)=0;
+Query OK, 0 rows affected (0.00 sec)
+
++----------+-------+---------+-----------+------------+--------------------------+------+--------+-----------+------+
+| Fname    | Minit | Lname   | Ssn       | Bdate      | Address                  | Sex  | Salary | Super_ssn | Dno  |
++----------+-------+---------+-----------+------------+--------------------------+------+--------+-----------+------+
+| Franklin | T     | Wong    | 333445555 | 1955-12-08 | 638 Voss, Houston, TX    | M    |  12000 | 888665555 |   12 |
+| Ramesh   | K     | Narayan | 666884444 | 1962-09-15 | 975 Fire Oak, Humble, TX | M    |   4940 | 333445555 |   20 |
+| James    | E     | Borg    | 888665555 | 1957-11-10 | 450 Stone, Houston, TX   | M    |  55000 | NULL      |   10 |
+| Ahmad    | V     | Jabbar  | 987987987 | 1969-03-29 | 980 Dallas, Houston, TX  | M    |   6500 | 987654321 |   20 |
++----------+-------+---------+-----------+------------+--------------------------+------+--------+-----------+------+
+4 rows in set (0.00 sec)
+
+mysql>/*2*/set @i=0; SELECT * FROM (SELECT e.*, @i := @i+1 rn FROM EMPLOYEE e) as t WHERE MOD(t.rn,2)=0;
++----------+-------+---------+-----------+------------+--------------------------+------+----------+-----------+-----+
+| Fname    | Minit | Lname   | Ssn       | Bdate      | Address                  | Sex  | Salary   | Super_ssn | Dno | 
++----------+-------+---------+-----------+------------+--------------------------+------+----------+-----------+-----+
+| Franklin | T     | Wong    | 333445555 | 1955-12-08 | 638 Voss, Houston, TX    | M    | 40000.00 | 888665555 |   5 | 
+| Ramesh   | K     | Narayan | 666884444 | 1962-09-15 | 975 Fire Oak, Humble, TX | M    | 38000.00 | 333445555 |   5 | 
+| Jennifer | S     | Wallace | 987654321 | 1941-06-20 | 291 Berry, Bellaire, TX  | F    | 43000.00 | 888665555 |   4 |
+| Alicia   | J     | Zelaya  | 999887777 | 1968-01-19 | 3321 Castle, Spring, TX  | F    | 25000.00 | 987654321 |   4 | 
++----------+-------+---------+-----------+------------+--------------------------+------+----------+-----------+-----+
+4 rows in set (0.00 sec)
+
+
+mysql>/*3*/ set @date = cast('1995-01-13' as datetime); select year(@date);
+Query OK, 0 rows affected (0.00 sec)
+
++-------------+
+| year(@date) |
++-------------+
+|        1995 |
++-------------+
+1 row in set (0.00 sec)
+
+mysql> /*4*/ select left(bdate,4) from emp;
++---------------+
+| left(bdate,4) |
++---------------+
+| 1965          |
+| 1955          |
+| 1972          |
+| 1962          |
+| 1984          |
+| 1957          |
+| 1941          |
+| 1969          |
+| 1968          |
++---------------+
+9 rows in set (0.00 sec)
+
+mysql> /*5*/ select left(Fname,3) from emp;
++---------------+
+| left(Fname,3) |
++---------------+
+| Joh           |
+| Fra           |
+| Joy           |
+| Ram           |
+| Eve           |
+| Jam           |
+| Jen           |
+| Ahm           |
+| Ali           |
++---------------+
+9 rows in set (0.00 sec)
+
+mysql>/*6 a*/ select if(DATE_FORMAT('2013-06-02','%d-%m-%Y') is null , 'TRUE','FALSE') as same_date_format;
++-------------------+
+| same_date_format  |
++-------------------+
+| FALSE             |
++-------------------+
+1 row in set (0.00 sec)
+
+mysql>/*6 b*/ select if(DATE_FORMAT('2013-06-02','%Y-%m-%d') is null, 'TRUE','FALSE')  as same_date_format ;
++-------------------+
+| same_date_format  |
++-------------------+
+| TRUE              |
++-------------------+
+1 row in set (0.00 sec)
+
+mysql>/*7*/ create table table_for_duplicates (x int, y int);
+Query OK, 0 rows affected (0.30 sec)
+
+mysql> insert into table_for_duplicates values (1,2),(2,3),(1,2),(2,3),(3,4);
+Query OK, 5 rows affected (0.09 sec)
+Records: 5  Duplicates: 0  Warnings: 0
+
+mysql> select * from table_for_duplicates;
++------+------+
+| x    | y    |
++------+------+
+|    1 |    2 |
+|    2 |    3 |
+|    1 |    2 |
+|    2 |    3 |
+|    3 |    4 |
++------+------+
+5 rows in set (0.00 sec)
+
+mysql> select *  from table_for_duplicates t group by t.x,t.y having count(*) > 1;
++------+------+
+| x    | y    |
++------+------+
+|    1 |    2 |
+|    2 |    3 |
++------+------+
+2 rows in set (0.00 sec)
+
+mysql>/*9*/ insert into table_for_not_duplicates select distinct * from table_for_duplicates;
+Query OK, 3 rows affected (0.42 sec)
+Records: 3  Duplicates: 0  Warnings: 0
+
+mysql> drop table table_for_duplicates;
+Query OK, 0 rows affected (0.18 sec)
+
+mysql> rename table table_for_not_duplicates to table_for_duplicates;
+Query OK, 0 rows affected (0.10 sec)
+
+mysql>/*10*/ select min(sal) from (select salary as sal from emp order by sal desc limit 3) as s;
++----------+
+| min(sal) |
++----------+
+|    43000 |
++----------+
+1 row in set (0.00 sec)
+
+mysql> /*11*/ select * from (select salary as sal from emp order by sal desc limit 3) as s; 
++-------+
+| sal   |
++-------+
+| 55000 |
+| 50000 |
+| 43000 |
++-------+
+3 rows in set (0.00 sec)
+
+mysql> /*14*/ select now();
++---------------------+
+| now()               |
++---------------------+
+| 2017-02-28 15:56:38 |
++---------------------+
+1 row in set (0.00 sec)
+
+mysql>/*13*/ select year(BDate) as 'YEAR',month(Bdate) as 'MONTH',day(BDate) as 'DAY' from employee;
++------+-------+------+
+| YEAR | MONTH | DAY  |
++------+-------+------+
+| 1965 |     1 |    9 |
+| 1955 |    12 |    8 |
+| 1972 |     7 |   31 |
+| 1962 |     9 |   15 |
+| 1937 |    11 |   10 |
+| 1941 |     6 |   20 |
+| 1969 |     3 |   29 |
+| 1968 |     1 |   19 |
++------+-------+------+
+8 rows in set (0.00 sec)
+
+mysql>/*14*/ select TIME(NOW());
++-------------+
+| TIME(NOW()) |
++-------------+
+| 00:03:44    |
++-------------+
+1 row in set (0.00 sec)
+
+mysql>/*15*/ set @d:='1992-12-13 12:00:00'; select date(@d);
+Query OK, 0 rows affected (0.00 sec)
+
++------------+
+| date(@d)   |
++------------+
+| 1992-12-13 |
++------------+
+1 row in set (0.00 sec)
+
+mysql> /*16*/select date_add(@d,interval 1 day);
++-----------------------------+
+| date_add(@d,interval 1 day) |
++-----------------------------+
+| 1992-12-14 12:00:00         |
++-----------------------------+
+1 row in set (0.00 sec)
+
+mysql> /*18*/select replace(fname,' ','') from emp;
++-----------------------+
+| replace(fname,' ','') |
++-----------------------+
+| John                  |
+| Franklin              |
+| Joyce                 |
+| Ramesh                |
+| Evelyn                |
+| James                 |
+| Jennifer              |
+| Ahmad                 |
+| Alicia                |
++-----------------------+
+9 rows in set (0.00 sec)
+
+mysql>/*19*/ select length(fname) from EMPLOYEE;
++---------------+
+| length(fname) |
++---------------+
+|             4 |
+|             8 |
+|             5 |
+|             6 |
+|             5 |
+|             8 |
+|             5 |
+|             6 |
++---------------+
+8 rows in set (0.00 sec)
+
+mysql> select max(LENGTH(fname)) from EMPLOYEE;
++--------------------+
+| max(LENGTH(fname)) |
++--------------------+
+|                  8 |
++--------------------+
+1 row in set (0.00 sec)
+
+
+mysql> /*20*/select replace(fname,'o','*') from emp;
++------------------------+
+| replace(fname,'o','*') |
++------------------------+
+| J*hn                   |
+| Franklin               |
+| J*yce                  |
+| Ramesh                 |
+| Evelyn                 |
+| James                  |
+| Jennifer               |
+| Ahmad                  |
+| Alicia                 |
++------------------------+
+9 rows in set (0.00 sec)
+
+mysql> /*19*/select length(fname) from emp;
++---------------+
+| length(fname) |
++---------------+
+|             4 |
+|             8 |
+|             5 |
+|             6 |
+|             6 |
+|             5 |
+|             8 |
+|             5 |
+|             6 |
++---------------+
+9 rows in set (0.00 sec)
+
+mysql>/*21*/ select concat(fname,'_',lname) as name from emp;
++------------------+
+| name             |
++------------------+
+| John_Smith       |
+| Franklin_Wong    |
+| Joyce_English    |
+| Ramesh_Narayan   |
+| James_Borg       |
+| Jennifer_Wallace |
+| Ahmad_Jabbar     |
+| Alicia_Zelaya    |
++------------------+
+8 rows in set (0.00 sec)
+
+mysql>/*22*/ select fname from emp where fname like 'john';
++-------+
+| fname |
++-------+
+| John  |
++-------+
+1 row in set (0.00 sec)
+
+mysql>/*23*/ select fname from emp where bdate > '05/01/1980' and bdate < '31/12/2016';
++----------+
+| fname    |
++----------+
+| John     |
+| Franklin |
+| Joyce    |
+| Ramesh   |
+| James    |
+| Jennifer |
+| Ahmad    |
+| Alicia   |
++----------+
+8 rows in set, 2 warnings (0.00 sec)
+
+mysql> notee;
+
+mysql> /*25*/ select * from (select concat(fname,' ',minit,' ',lname) as name from emp) as E where name like '% % %';
++--------------------+
+| name               |
++--------------------+
+| John B Smith       |
+| Franklin T Wong    |
+| Joyce A English    |
+| Ramesh K Narayan   |
+| James E Borg       |
+| Jennifer S Wallace |
+| Ahmad V Jabbar     |
+| Alicia J Zelaya    |
++--------------------+
+8 rows in set (0.00 sec)
+
+mysql> /*26*/ select fname from emp where fname like '___n';
++-------+
+| fname |
++-------+
+| John  |
++-------+
+1 row in set (0.00 sec)
+
+mysql> /*27*/ select fname from emp where monthname(bdate) like 'Jan';
+Empty set (0.00 sec)
+
+mysql>/*28*/ SELECT create_time FROM INFORMATION_SCHEMA.TABLES WHERE table_schema = 'company' AND table_name = 'emp';
++---------------------+
+| create_time         |
++---------------------+
+| 2017-03-06 19:00:03 |
++---------------------+
+1 row in set (0.00 sec)
+
+mysql>/*28*/ select curdate();
++------------+
+| curdate()  |
++------------+
+| 2017-03-02 |
++------------+
+1 row in set (0.00 sec)
+
+mysql>/*29*/ create table table1 (x int, y int);
+Query OK, 0 rows affected (0.25 sec)
+
+mysql> insert into table 1 values (1,2),(3,4);
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'table 1 values (1,2),(3,4)' at line 1
+mysql> insert into table1 values (1,2),(3,4);
+Query OK, 2 rows affected (0.07 sec)
+Records: 2  Duplicates: 0  Warnings: 0
+
+mysql> select * from table1;
++------+------+
+| x    | y    |
++------+------+
+|    1 |    2 |
+|    3 |    4 |
++------+------+
+2 rows in set (0.00 sec)
+
+mysql> select * from table1 where (x,y) in (select * from table_for_duplicates);
++------+------+
+| x    | y    |
++------+------+
+|    1 |    2 |
+|    3 |    4 |
++------+------+
+2 rows in set (0.00 sec)
+
+mysql> /*30*/ select fname from (select fname,replace(lname,'a','*') as lname from emp) as E where lname like '%*%';
++----------+
+| fname    |
++----------+
+| Ramesh   |
+| Jennifer |
+| Ahmad    |
+| Alicia   |
++----------+
+4 rows in set (0.00 sec)
+
+mysql> notee;
+
+mysql>/*31*/ select replace(Dname,'a','*') from department;
++------------------------+
+| REPLACE(Dname,'a','*') |
++------------------------+
+| Administr*tion         |
+| He*dqu*rters           |
+| Rese*rch               |
++------------------------+
+3 rows in set (0.00 sec)
+
+mysql>/*32*/ select count(*) from EMPLOYEE group by YEAR(BDate),MONTH(BDate);
++----------+
+| count(*) |
++----------+
+|        1 |
+|        1 |
+|        1 |
+|        1 |
+|        1 |
+|        1 |
+|        1 |
+|        1 |
++----------+
+8 rows in set (0.00 sec)
+
+mysql>/*33*/ SELECT SUBSTRING(Dname,1,2) from DEPARTMENT;
++----------------------+
+| SUBSTRING(Dname,1,2) |
++----------------------+
+| Ad                   |
+| He                   |
+| Re                   |
++----------------------+
+3 rows in set (0.00 sec)
+
+mysql>/*34*/ select lower(Fname), upper(Fname) from employee;
++--------------+--------------+
+| LOWER(Fname) | UPPER(Fname) |
++--------------+--------------+
+| john         | JOHN         |
+| franklin     | FRANKLIN     |
+| joyce        | JOYCE        |
+| ramesh       | RAMESH       |
+| james        | JAMES        |
+| jennifer     | JENNIFER     |
+| ahmad        | AHMAD        |
+| alicia       | ALICIA       |
++--------------+--------------+
+8 rows in set (0.00 sec)
+
+mysql> /*35*/ select * from emp limit 5;
++----------+-------+---------+-----------+------------+-------------------------+------+--------+-----------+------+
+| fname    | minit | lname   | ssn       | bdate      | address                 | sex  | salary | super_ssn | dno  |
++----------+-------+---------+-----------+------------+-------------------------+------+--------+-----------+------+
+| John     | B     | Smith   | 123456789 | 1965-01-09 | 731 Fondren, Houston,TX | M    |  30000 | 333445555 |    5 |
+| Franklin | T     | Wong    | 333445555 | 1955-12-08 | 638 Voss, Houston,TX    | M    |  40000 | 888665555 |    5 |
+| Joyce    | A     | English | 453453453 | 1972-07-31 | 5631 Rice, Houston,TX   | F    |  25000 | 333445555 |    5 |
+| Ramesh   | K     | Narayan | 666884444 | 1962-09-15 | 975 Fire Oak, Humble,TX | M    |  38000 | 333445555 |    5 |
+| James    | E     | Borg    | 888665555 | 1937-11-10 | 450 Stone, Houston,TX   | M    |  55000 |      NULL |    1 |
++----------+-------+---------+-----------+------------+-------------------------+------+--------+-----------+------+
+5 rows in set (0.00 sec)
+
+mysql> /*36*/ select * from emp group by ssn order by ssn desc limit 5;
++----------+-------+---------+-----------+------------+-------------------------+------+--------+-----------+------+
+| fname    | minit | lname   | ssn       | bdate      | address                 | sex  | salary | super_ssn | dno  |
++----------+-------+---------+-----------+------------+-------------------------+------+--------+-----------+------+
+| Alicia   | J     | Zelaya  | 999887777 | 1968-01-19 | 3321 Castle, Spring,TX  | F    |  25000 | 987654321 |    4 |
+| Ahmad    | V     | Jabbar  | 987987987 | 1969-03-29 | 980 Dallas, Houston,TX  | M    |  25000 | 987654321 |    4 |
+| Jennifer | S     | Wallace | 987654321 | 1941-06-20 | 291 Berry, Bellaire,TX  | F    |  43000 | 888665555 |    4 |
+| James    | E     | Borg    | 888665555 | 1937-11-10 | 450 Stone, Houston,TX   | M    |  55000 |      NULL |    1 |
+| Ramesh   | K     | Narayan | 666884444 | 1962-09-15 | 975 Fire Oak, Humble,TX | M    |  38000 | 333445555 |    5 |
++----------+-------+---------+-----------+------------+-------------------------+------+--------+-----------+------+
+5 rows in set (0.00 sec)
+
+mysql>/*38*/ (select Fname from EMPLOYEE) UNION (SELECT Lname FROM EMPLOYEE);
++----------+
+| Fname    |
++----------+
+| John     |
+| Franklin |
+| Joyce    |
+| Ramesh   |
+| James    |
+| Jennifer |
+| Ahmad    |
+| Alicia   |
+| Smith    |
+| Wong     |
+| English  |
+| Narayan  |
+| Borg     |
+| Wallace  |
+| Jabbar   |
+| Zelaya   |
++----------+
+16 rows in set (0.00 sec)
+
+mysql>/*39*/ create table EMPLOYEE1 LIKE EMPLOYEE;
+Query OK, 0 rows affected (0.39 sec)
+
+mysql>/*40*/ (select * from employee) union (select * from employee1);
++----------+-------+---------+-----------+------------+--------------------------+------+----------+-----------+-----+------------+------+
+| Fname    | Minit | Lname   | Ssn       | Bdate      | Address                  | Sex  | Salary   | Super_ssn | Dno | Mobile_No  | Job  |
++----------+-------+---------+-----------+------------+--------------------------+------+----------+-----------+-----+------------+------+
+| John     | B     | Smith   | 123456789 | 1965-01-09 | 731 Fondren, Houston, TX | M    | 30000.00 | 333445555 |   5 | 0000000000 | NULL |
+| Franklin | T     | Wong    | 333445555 | 1955-12-08 | 638 Voss, Houston, TX    | M    | 40000.00 | 888665555 |   5 | 0000000000 | NULL |
+| Joyce    | A     | English | 453453453 | 1972-07-31 | 5631 Rice, Houston, TX   | F    | 25000.00 | 333445555 |   5 | 0000000000 | NULL |
+| Ramesh   | K     | Narayan | 666884444 | 1962-09-15 | 975 Fire Oak, Humble, TX | M    | 38000.00 | 333445555 |   5 | 0000000000 | NULL |
+| James    | E     | Borg    | 888665555 | 1937-11-10 | 450 Stone, Houston, TX   | M    | 71500.00 | NULL      |   1 | 0000000000 | NULL |
+| Jennifer | S     | Wallace | 987654321 | 1941-06-20 | 291 Berry, Bellaire, TX  | F    | 43000.00 | 888665555 |   4 | 0000000000 | NULL |
+| Ahmad    | V     | Jabbar  | 987987987 | 1969-03-29 | 980 Dallas, Houston, TX  | M    | 25000.00 | 987654321 |   4 | 0000000000 | NULL |
+| Alicia   | J     | Zelaya  | 999887777 | 1968-01-19 | 3321 Castle, Spring, TX  | F    | 25000.00 | 987654321 |   4 | 0000000000 | NULL |
++----------+-------+---------+-----------+------------+--------------------------+------+----------+-----------+-----+------------+------+
+8 rows in set (0.00 sec)
+
+mysql>/*41*/ select * from employee 1 where Fname in (select Fname from employee);
++----------+-------+---------+-----------+------------+--------------------------+------+----------+-----------+-----+------------+------+
+| Fname    | Minit | Lname   | Ssn       | Bdate      | Address                  | Sex  | Salary   | Super_ssn | Dno | Mobile_No  | Job  |
++----------+-------+---------+-----------+------------+--------------------------+------+----------+-----------+-----+------------+------+
+| John     | B     | Smith   | 123456789 | 1965-01-09 | 731 Fondren, Houston, TX | M    | 30000.00 | 333445555 |   5 | 0000000000 | NULL |
+| Franklin | T     | Wong    | 333445555 | 1955-12-08 | 638 Voss, Houston, TX    | M    | 40000.00 | 888665555 |   5 | 0000000000 | NULL |
+| Joyce    | A     | English | 453453453 | 1972-07-31 | 5631 Rice, Houston, TX   | F    | 25000.00 | 333445555 |   5 | 0000000000 | NULL |
++----------+-------+---------+-----------+------------+--------------------------+------+----------+-----------+-----+------------+------+
+3 rows in set (0.00 sec)
+
+mysql>/*42*/ select database();
++------------+
+| database() |
++------------+
+| company    |
++------------+
+1 row in set (0.00 sec)
+
+mysql>/*43*/ SELECT DATABASE();
++------------+
+| DATABASE() |
++------------+
+| COMPANY    |
++------------+
+1 row in set (0.00 sec)
+
+mysql> /*44*/ select user();
++----------------+
+| user()         |
++----------------+
+| root@localhost |
++----------------+
+1 row in set (0.00 sec)
+
+mysql> /*45*/ select version();
++-------------------------+
+| version()               |
++-------------------------+
+| 5.7.17-0ubuntu0.16.04.1 |
++-------------------------+
+1 row in set (0.00 sec)
+
+mysql>/*46*/ select CONV((b'100') & (b'101'),10,2);
++--------------------------------+
+| CONV((b'100') & (b'101'),10,2) |
++--------------------------------+
+| 100                            |
++--------------------------------+
+1 row in set (0.00 sec)
+
+mysql> select CONV((b'100') | (b'101'),10,2);
++--------------------------------+
+| CONV((b'100') | (b'101'),10,2) |
++--------------------------------+
+| 101                            |
++--------------------------------+
+1 row in set (0.00 sec)
+
+mysql> select CONV((b'100') ^ (b'101'),10,2);
++--------------------------------+
+| CONV((b'100') ^ (b'101'),10,2) |
++--------------------------------+
+| 1                              |
++--------------------------------+
+1 row in set (0.00 sec)
+
+mysql>/*47*/ select * from words where line REGEXP 'mysql|oracle';
++-------------+
+| line        |
++-------------+
+| amysql      |
+| aoracle     |
+| a mysql     |
+| mysqloracle |
++-------------+
+4 rows in set (0.00 sec)
+
+mysql> /*48*/ select datediff('2016-12-22','2016-12-12');
++-------------------------------------+
+| datediff('2016-12-22','2016-12-12') |
++-------------------------------------+
+|                                  10 |
++-------------------------------------+
+1 row in set (0.00 sec)
+
+mysql>/*49*/ select now() + interval 1 day;
++------------------------+
+| now() + interval 1 day |
++------------------------+
+| 2017-03-07 20:01:00    |
++------------------------+
+1 row in set (0.00 sec)
+
+
+mysql> /*50*/ select now() + interval 2 hour + interval 5000 minute;
++------------------------------------------------+
+| now() + interval 2 hour + interval 5000 minute |
++------------------------------------------------+
+| 2017-03-10 09:23:00                            |
++------------------------------------------------+
+1 row in set (0.00 sec)
+
+mysql>/*51*/ select ceil(5.7);
++-----------+
+| ceil(5.7) |
++-----------+
+|         6 |
++-----------+
+1 row in set (0.00 sec)
+
+mysql> select floor(5.7);
++------------+
+| floor(5.7) |
++------------+
+|          5 |
++------------+
+1 row in set (0.00 sec)
+
+mysql> select log(5);
++--------------------+
+| log(5)             |
++--------------------+
+| 1.6094379124341003 |
++--------------------+
+1 row in set (0.00 sec)
+
+mysql> select mod(5,2);
++----------+
+| mod(5,2) |
++----------+
+|        1 |
++----------+
+1 row in set (0.00 sec)
+
+mysql> select power(2,5);
++------------+
+| power(2,5) |
++------------+
+|         32 |
++------------+
+1 row in set (0.00 sec)
+
+mysql> select round(5.7);
++------------+
+| round(5.7) |
++------------+
+|          6 |
++------------+
+1 row in set (0.00 sec)
+
+mysql> select truncate(5.785,2);
++-------------------+
+| truncate(5.785,2) |
++-------------------+
+|              5.78 |
++-------------------+
+1 row in set (0.00 sec)
+
+mysql> notee;
+
+mysql>/*52 a*/ select * from EMPLOYEE where Fname REGEXP '^J';
++----------+-------+---------+-----------+------------+--------------------------+------+----------+-----------+-----+
+| Fname    | Minit | Lname   | Ssn       | Bdate      | Address                  | Sex  | Salary   | Super_ssn | Dno | 
++----------+-------+---------+-----------+------------+--------------------------+------+----------+-----------+-----+
+| John     | B     | Smith   | 123456789 | 1965-01-09 | 731 Fondren, Houston, TX | M    | 30000.00 | 333445555 |   5 | 
+| Joyce    | A     | English | 453453453 | 1972-07-31 | 5631 Rice, Houston, TX   | F    | 25000.00 | 333445555 |   5 | 
+| James    | E     | Borg    | 888665555 | 1937-11-10 | 450 Stone, Houston, TX   | M    | 71500.00 | NULL      |   1 | 
+| Jennifer | S     | Wallace | 987654321 | 1941-06-20 | 291 Berry, Bellaire, TX  | F    | 43000.00 | 888665555 |   4 | 
++----------+-------+---------+-----------+------------+--------------------------+------+----------+-----------+-----+
+4 rows in set (0.00 sec)
+
+mysql>/*52 b*/ select * from EMPLOYEE where Fname REGEXP 'a.*$';
++----------+-------+---------+-----------+------------+--------------------------+------+----------+-----------+-----+
+| Fname    | Minit | Lname   | Ssn       | Bdate      | Address                  | Sex  | Salary   | Super_ssn | Dno | 
++----------+-------+---------+-----------+------------+--------------------------+------+----------+-----------+-----+
+| Franklin | T     | Wong    | 333445555 | 1955-12-08 | 638 Voss, Houston, TX    | M    | 40000.00 | 888665555 |   5 |
+| Ramesh   | K     | Narayan | 666884444 | 1962-09-15 | 975 Fire Oak, Humble, TX | M    | 38000.00 | 333445555 |   5 |
+| James    | E     | Borg    | 888665555 | 1937-11-10 | 450 Stone, Houston, TX   | M    | 71500.00 | NULL      |   1 |
+| Ahmad    | V     | Jabbar  | 987987987 | 1969-03-29 | 980 Dallas, Houston, TX  | M    | 25000.00 | 987654321 |   4 | 
+| Alicia   | J     | Zelaya  | 999887777 | 1968-01-19 | 3321 Castle, Spring, TX  | F    | 25000.00 | 987654321 |   4 | 
++----------+-------+---------+-----------+------------+--------------------------+------+----------+-----------+-----+
+5 rows in set (0.00 sec)
+
+mysql>/*52 c*/ select * from EMPLOYEE where Fname REGEXP '.*n$';
++----------+-------+-------+-----------+------------+--------------------------+------+----------+-----------+-----+
+| Fname    | Minit | Lname | Ssn       | Bdate      | Address                  | Sex  | Salary   | Super_ssn | Dno | 
++----------+-------+-------+-----------+------------+--------------------------+------+----------+-----------+-----+
+| John     | B     | Smith | 123456789 | 1965-01-09 | 731 Fondren, Houston, TX | M    | 30000.00 | 333445555 |   5 | 
+| Franklin | T     | Wong  | 333445555 | 1955-12-08 | 638 Voss, Houston, TX    | M    | 40000.00 | 888665555 |   5 | 
++----------+-------+-------+-----------+------------+--------------------------+------+----------+-----------+-----+
+2 rows in set (0.00 sec)
+
+mysql>/*52 d*/ select * from EMPLOYEE where Fname REGEXP 'x*';
++----------+-------+---------+-----------+------------+--------------------------+------+----------+-----------+-----+
+| Fname    | Minit | Lname   | Ssn       | Bdate      | Address                  | Sex  | Salary   | Super_ssn | Dno | 
++----------+-------+---------+-----------+------------+--------------------------+------+----------+-----------+-----+
+| John     | B     | Smith   | 123456789 | 1965-01-09 | 731 Fondren, Houston, TX | M    | 30000.00 | 333445555 |   5 | 
+| Franklin | T     | Wong    | 333445555 | 1955-12-08 | 638 Voss, Houston, TX    | M    | 40000.00 | 888665555 |   5 | 
+| Joyce    | A     | English | 453453453 | 1972-07-31 | 5631 Rice, Houston, TX   | F    | 25000.00 | 333445555 |   5 | 
+| Ramesh   | K     | Narayan | 666884444 | 1962-09-15 | 975 Fire Oak, Humble, TX | M    | 38000.00 | 333445555 |   5 | 
+| James    | E     | Borg    | 888665555 | 1937-11-10 | 450 Stone, Houston, TX   | M    | 71500.00 | NULL      |   1 | 
+| Jennifer | S     | Wallace | 987654321 | 1941-06-20 | 291 Berry, Bellaire, TX  | F    | 43000.00 | 888665555 |   4 | 
+| Ahmad    | V     | Jabbar  | 987987987 | 1969-03-29 | 980 Dallas, Houston, TX  | M    | 25000.00 | 987654321 |   4 | 
+| Alicia   | J     | Zelaya  | 999887777 | 1968-01-19 | 3321 Castle, Spring, TX  | F    | 25000.00 | 987654321 |   4 | 
++----------+-------+---------+-----------+------------+--------------------------+------+----------+-----------+-----+
+8 rows in set (0.00 sec)
+
+mysql>/*52 e*/ select 'abab' REGEXP 'ab|de';
++-----------------------+
+| 'abab' REGEXP 'ab|de' |
++-----------------------+
+|                     1 |
++-----------------------+
+1 row in set (0.00 sec)
+
+mysql> select 'abab' REGEXP 'ac|de';
++-----------------------+
+| 'abab' REGEXP 'ac|de' |
++-----------------------+
+|                     0 |
++-----------------------+
+1 row in set (0.00 sec)
+
+mysql> select 'abde' REGEXP 'ac|de';
++-----------------------+
+| 'abde' REGEXP 'ac|de' |
++-----------------------+
+|                     1 |
++-----------------------+
+1 row in set (0.00 sec)
+
+mysql> select * from EMPLOYEE where Fname REGEXP 'ja|xy';
++-------+-------+-------+-----------+------------+------------------------+------+----------+-----------+-----+
+| Fname | Minit | Lname | Ssn       | Bdate      | Address                | Sex  | Salary   | Super_ssn | Dno | 
++-------+-------+-------+-----------+------------+------------------------+------+----------+-----------+-----+
+| James | E     | Borg  | 888665555 | 1937-11-10 | 450 Stone, Houston, TX | M    | 71500.00 | NULL      |   1 | 
++-------+-------+-------+-----------+------------+------------------------+------+----------+-----------+-----+
+1 row in set (0.00 sec)
+
+mysql> select * from EMPLOYEE where Fname REGEXP 'ja|fr';
++----------+-------+-------+-----------+------------+------------------------+------+----------+-----------+-----+
+| Fname    | Minit | Lname | Ssn       | Bdate      | Address                | Sex  | Salary   | Super_ssn | Dno |
++----------+-------+-------+-----------+------------+------------------------+------+----------+-----------+-----+
+| Franklin | T     | Wong  | 333445555 | 1955-12-08 | 638 Voss, Houston, TX  | M    | 40000.00 | 888665555 |   5 | 
+| James    | E     | Borg  | 888665555 | 1937-11-10 | 450 Stone, Houston, TX | M    | 71500.00 | NULL      |   1 | 
++----------+-------+-------+-----------+------------+------------------------+------+----------+-----------+-----+
+2 rows in set (0.00 sec)
+
+mysql>/*53*/ select if('David' like 'David','yes','No');
++-------------------------------------+
+| if('David' like 'David','yes','No') |
++-------------------------------------+
+| yes                                 |
++-------------------------------------+
+1 row in set (0.00 sec)
+
+mysql> select if('David' like 'Davi','yes','No');
++------------------------------------+
+| if('David' like 'Davi','yes','No') |
++------------------------------------+
+| No                                 |
++------------------------------------+
+1 row in set (0.00 sec)
+
+mysql>/*54*/ create table marks(score int);
+Query OK, 0 rows affected (0.32 sec)
+
+mysql> insert into marks values(97),(87),(73),(95),(54),(10);
+Query OK, 6 rows affected (0.10 sec)
+Records: 6  Duplicates: 0  Warnings: 0
+
+mysql> select * from marks;
++-------+
+| score |
++-------+
+|    97 |
+|    87 |
+|    73 |
+|    95 |
+|    54 |
+|    10 |
++-------+
+6 rows in set (0.00 sec)
+
+mysql> SELECT score, CASE 
+    -> WHEN score > 90 THEN 'A'
+    -> WHEN score > 80 AND score <=90 THEN 'B'
+    -> WHEN score > 70 AND score <= 80 THEN 'C'
+    -> WHEN score > 60 AND score <= 70 THEN 'D'
+    -> WHEN score > 50 AND score <= 60 THEN 'E'
+    -> ELSE 'F'
+    -> END AS 'Grade'
+    -> FROM marks;
++-------+-------+
+| score | Grade |
++-------+-------+
+|    97 | A     |
+|    87 | B     |
+|    73 | C     |
+|    95 | A     |
+|    54 | E     |
+|    10 | F     |
++-------+-------+
+6 rows in set (0.00 sec)
+
+mysql>/*55*/ select score , if(score > 90,'A',if(score > 80,'B',if(score > 70,'C',if(score > 60, 'D',if(score > 50,'E','F'))))) as Grade from marks;
++-------+-------+
+| score | Grade |
++-------+-------+
+|    97 | A     |
+|    87 | B     |
+|    73 | C     |
+|    95 | A     |
+|    54 | E     |
+|    10 | F     |
++-------+-------+
+6 rows in set (0.00 sec)
+
+mysql>/*56*/ grant all privileges on *.* to g@localhost identified by 'password';
+Query OK, 0 rows affected, 1 warning (0.00 sec)

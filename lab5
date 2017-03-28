@@ -1,0 +1,304 @@
+mysql> select aname from aircraft a,certified c where a.aid=c.aid and c.eid in(select eid from employees where salary>=80000);
++------------+
+| aname      |
++------------+
+| Airbus     |
+| Jet01      |
+| Airbus380  |
+| Boeing     |
+| Aircraft02 |
+| Boeing     |
++------------+
+6 rows in set (0.28 sec)
+
+mysql> select c.eid,a.cruisingrange from certified c,aircraft a where c.eid in(select t.eid from certified t group by t.eid having count(t.eid)>=3) and a.aid=c.aid;
++-----+---------------+
+| eid | cruisingrange |
++-----+---------------+
+|   1 |          1000 |
+|   2 |          1000 |
+|   1 |          5000 |
+|   1 |          5000 |
+|   2 |          5000 |
+|   1 |          8000 |
+|   2 |          8000 |
+|   1 |           800 |
+|   1 |          1000 |
++-----+---------------+
+9 rows in set (0.00 sec)
+
+mysql> select ename from employees where salary < all(select price from flight where frm='Delhi' and too='Frankfurt');
++-------+
+| ename |
++-------+
+| Ajay  |
+| Ajith |
+| Arnab |
+| Harry |
+| Josh  |
++-------+
+5 rows in set (0.00 sec)
+
+mysql> select a.aname,avg(e.salary) from aircraft a,employees e,certified c where cruisingrange>=1000 and c.eid=e.eid and c.aid=a.aid group by c.aid;
++------------+---------------+
+| aname      | avg(e.salary) |
++------------+---------------+
+| Airbus     |    57500.0000 |
+| Boeing     |    73333.3333 |
+| Jet01      |    57500.0000 |
+| Airbus380  |    53333.3333 |
+| Aircraft03 |    40000.0000 |
++------------+---------------+
+5 rows in set (0.00 sec)
+
+mysql> select ename from employees,aircraft where eid in( select eid from certified c,aircraft a where c.aid=a.aid and aname='Boeing') and cruisingrange <= (select max(distance) from flight where frm='Banglore');
+Empty set (0.00 sec)
+
+mysql> select aid from aircraft where cruisingrange>=(select distance from flight where frm='Delhi'and too='Mumbai');
++-----+
+| aid |
++-----+
+| 302 |
+| 306 |
+| 378 |
++-----+
+3 rows in set (0.00 sec)
+
+mysql> select frm,too from flight f,aircraft a,certified c where f.distance<=a.cruisingrange and a.aid=c.aid and c.eid in (select eid from employees where salary>=100000);
++-----------+-----------+
+| frm       | too       |
++-----------+-----------+
+| Bangalore | Mangalore |
+| Bangalore | Delhi     |
+| Bangalore | Mumbai    |
+| Delhi     | Mumbai    |
++-----------+-----------+
+4 rows in set (0.00 sec)
+
+mysql> select ename from employees e,certified c where e.eid=c.eid and c.aid in(select aid from aircraft where cruisingrange>=3000)and c.aid not in(select aid from aircraft where aname='Boeing');
++-------+
+| ename |
++-------+
+| Ajay  |
+| Ajith |
+| Ajay  |
+| Ajith |
+| Harry |
++-------+
+5 rows in set (0.46 sec)
+
+mysql> select (avg(e.salary)-avg(a.salary))as salary_difference from employees e,employees a where a.eid in (select eid from certified);
++-------------------+
+| salary_difference |
++-------------------+
+|            0.0000 |
++-------------------+
+1 row in set (0.00 sec)
+
+mysql> select ename,salary from employees where eid not in(select eid from certified) and salary > (select avg(salary) from employees where exists(select c.eid from certified c where eid=c.eid));
+Empty set (0.00 sec)
+
+mysql> select ename from employees where eid in(select eid from certified c,aircraft a where c.aid=a.aid and cruisingrange>=1000) and eid not in(select eid from certified c,aircraft a where c.aid=a.aid and cruisingrange<1000);
++-------+
+| ename |
++-------+
+| Ajith |
+| Harry |
+| Ram   |
++-------+
+3 rows in set (0.00 sec)
+
+mysql> select ename from employees where eid in(select eid from certified c,aircraft a where c.aid=a.aid and cruisingrange<=1000) and eid not in(select eid from certified c,aircraft a where c.aid=a.aid and cruisingrange>1000) group by eid having count(eid)>=2;
+Empty set (0.00 sec)
+
+mysql> select ename from employees where eid in(select eid from certified c,aircraft a where c.aid=a.aid and cruisingrange>=1000 and aname='Boeing') and eid not in(select eid from certified c,aircraft a where c.aid=a.aid and cruisingrange<1000);
++-------+
+| ename |
++-------+
+| Ram   |
++-------+
+1 row in set (0.00 sec)
+
+mysql> select eid from certified where aid in(select aid from aircraft where aname='Boeing');
++-----+
+| eid |
++-----+
+|   1 |
+|   5 |
+|   7 |
++-----+
+3 rows in set (0.00 sec)
+
+mysql> select ename from employees e,certified c where aid in(select aid from aircraft where aname='Boeing') and e.eid=c.eid;
++-------+
+| ename |
++-------+
+| Ajay  |
+| Ron   |
+| Ram   |
++-------+
+3 rows in set (0.00 sec)
+
+mysql> select aid from aircraft where cruisingrange>=(select distance from flight where frm='Delhi' and too='Mumbai');
++-----+
+| aid |
++-----+
+| 302 |
+| 306 |
+| 378 |
++-----+
+3 rows in set (0.00 sec)
+
+mysql> select no from flight where distance <= (select cruisingrange from aircraft a,certified c,employees e where a.aid=c.aid and e.eid=c.eid and e.salary>=100000);
++----+
+| no |
++----+
+|  1 |
+|  2 |
+|  3 |
+|  4 |
++----+
+4 rows in set (0.00 sec)
+
+mysql> select ename from employees where eid in (select eid from certified c,aircraft a where a.aid=c.aid and cruisingrange>=3000) and eid not in(select eid from certified c,aircraft a where a.aid=c.aid and aname='Boeing');
++-------+
+| ename |
++-------+
+| Ajith |
+| Harry |
++-------+
+2 rows in set (0.01 sec)
+
+mysql> select eid from employees where salary in(select max(salary) from employees e1,certified c1 where e1.eid=c1.eid group by aid);
++-----+
+| eid |
++-----+
+|   2 |
+|   3 |
+|   5 |
+|   6 |
+|   7 |
++-----+
+5 rows in set (0.00 sec)
+
+mysql> create view v1 as select eid,salary from employees where eid not in(select eid from employees where salary =(select max(salary) from employees));
+Query OK, 0 rows affected (0.07 sec)
+
+mysql> select * from v1;
++-----+--------+
+| eid | salary |
++-----+--------+
+|   1 |  30000 |
+|   2 |  85000 |
+|   3 |  50000 |
+|   4 |  45000 |
+|   5 |  90000 |
+|   6 |  75000 |
++-----+--------+
+6 rows in set (0.00 sec)
+
+mysql> select eid from v1 where salary=(select max(salary) from v1);
++-----+
+| eid |
++-----+
+|   5 |
++-----+
+1 row in set (0.00 sec)
+
+mysql> create view v2 as select eid,count(c.aid) as 'Number_of_aircrafts' from certified c,aircraft a where c.aid=a.aid group by (eid);
+Query OK, 0 rows affected (0.05 sec)
+
+mysql> select * from v2;
++-----+---------------------+
+| eid | Number_of_aircrafts |
++-----+---------------------+
+|   1 |                   6 |
+|   2 |                   3 |
+|   3 |                   2 |
+|   4 |                   1 |
+|   5 |                   2 |
+|   6 |                   2 |
+|   7 |                   1 |
++-----+---------------------+
+7 rows in set (0.00 sec)
+
+mysql> select eid from v2 where Number_of_aircrafts=(select max(Number_of_aircrafts) from v2);
++-----+
+| eid |
++-----+
+|   1 |
++-----+
+1 row in set (0.00 sec)
+
+mysql> select eid from v2 where Number_of_aircrafts=3;
++-----+
+| eid |
++-----+
+|   2 |
++-----+
+1 row in set (0.00 sec)
+
+mysql> select salary from employees where eid in(select eid from certified where aid in (select aid from aircraft where exists(select f.distance from flight f where frm='Bangalore' and too='Frankfurt' and cruisingrange>=f.distance) or exists(select f2.distance from flight f1,flight f2 where f1.too=f2.frm and f1.frm='Bangalore' and f2.too='Frankfurt' and cruisingrange>=f2.distance) or exists(select f5.distance from flight f3,flight f4,flight f5 where f3.too=f4.frm and f4.too=f5.frm and f3.frm='Bangalore' and f5.too='Frankfurt' and cruisingrange>=f5.distance)));
++--------+
+| salary |
++--------+
+|  30000 |
+|  50000 |
+|  90000 |
+|  75000 |
++--------+
+4 rows in set (0.00 sec)
+
+
+mysql> select sum(salary) from employees where eid in(select eid from certified where aid in (select aid from aircraft where exists(select f.distance from flight f where frm='Bangalore' and too='Frankfurt' and cruisingrange>=f.distance and 2*f.distance>=30000) or exists(select f2.distance from flight f1,flight f2 where f1.too=f2.frm and f1.frm='Bangalore' and f2.too='Frankfurt' and cruisingrange>=f2.distance and 2*(f1.distance+f2.distance)>=30000) or exists(select f5.distance from flight f3,flight f4,flight f5 where f3.too=f4.frm and f4.too=f5.frm and f3.frm='Bangalore' and f5.too='Frankfurt' and cruisingrange>=f5.distance and 2*(f3.distance+f4.distance+f5.distance>=30000))));
++-------------+
+| sum(salary) |
++-------------+
+|      245000 |
++-------------+
+1 row in set (0.00 sec)
+
+
+mysql> select f1.frm as source,f1.too as intermediate_stop,f2.too as destination from flight f1,flight f2 where f1.too=f2.frm and f1.frm='Bangalore' and f2.too='Frankfurt';
++-----------+-------------------+-------------+
+| source    | intermediate_stop | destination |
++-----------+-------------------+-------------+
+| Bangalore | Delhi             | Frankfurt   |
+| Bangalore | Mumbai            | Frankfurt   |
++-----------+-------------------+-------------+
+2 rows in set (0.01 sec)
+
+
+mysql> create view v3 as select f1.frm as 'source',f1.too as 'intermediate_stop',f2.too as 'destination' from flight f1 left join flight f2 on f2.too is not NULL where f1.too=f2.frm;
+Query OK, 0 rows affected (0.28 sec)
+
+mysql> select * from v3;
++-----------+-------------------+-------------+
+| source    | intermediate_stop | destination |
++-----------+-------------------+-------------+
+| Bangalore | Delhi             | Mumbai      |
+| Bangalore | Delhi             | Frankfurt   |
+| Bangalore | Mumbai            | Frankfurt   |
+| Delhi     | Mumbai            | Frankfurt   |
++-----------+-------------------+-------------+
+4 rows in set (0.00 sec)
+
+mysql> create view v4 as select source,intermediate_stop as 'intermediate_stop_1',destination as 'intermediate_stop_2',f.too as 'destination' from v3 v left outer join flight f on f.too is not NULL where v.destination=f.frm;
+Query OK, 0 rows affected (0.30 sec)
+
+mysql> select * from v4;
++-----------+---------------------+---------------------+-------------+
+| source    | intermediate_stop_1 | intermediate_stop_2 | destination |
++-----------+---------------------+---------------------+-------------+
+| Bangalore | Delhi               | Mumbai              | Frankfurt   |
++-----------+---------------------+---------------------+-------------+
+1 row in set (0.00 sec)
+
+mysql> select source,intermediate_stop,destination from v3 where source='Bangalore' and destination='Frankfurt';
++-----------+-------------------+-------------+
+| source    | intermediate_stop | destination |
++-----------+-------------------+-------------+
+| Bangalore | Delhi             | Frankfurt   |
+| Bangalore | Mumbai            | Frankfurt   |
++-----------+-------------------+-------------+
+2 rows in set (0.00 sec)
