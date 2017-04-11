@@ -530,6 +530,23 @@ void update(MYSQL *con) {
 	}
 }
 
+void outputTable(MYSQL *con) {
+	printf("Enter the table name to be shown: ");
+	printf("\n1. Employee\n2. Department\n3. Project\n4. Works On\n5. Dependent\n6. Dept Locations");
+	printf("\nEnter your choice: ");
+	int choice;
+	scanf("%d",&choice);
+	system("clear");
+	switch(choice) {
+		case 1:	showTable(con, "EMPLOYEE"); break;
+		case 2:	showTable(con, "DEPARTMENT"); break;
+		case 3:	showTable(con, "PROJECT"); break;
+		case 4:	showTable(con, "WORKS_ON"); break;
+		case 5:	showTable(con, "DEPENDENT"); break;
+		case 6:	showTable(con, "DEPT_LOCATIONS"); break;
+	}
+}
+
 int main() {
 	MYSQL *con = mysql_init(NULL);
 	if(con==NULL) {
@@ -538,10 +555,10 @@ int main() {
 	}
 	if(mysql_real_connect(con,"localhost","root","","employee",0,NULL,0)==NULL)
 		finishQuery(con);
-	/* show_all_tables(con); */
+	/* showAllTables(con); */
 	int choice;
 	while(1) {
-		printf("\n1. Insert\n2. Delete\n3. Update\n4. Exit");
+		printf("\n1. Insert\n2. Delete\n3. Update\n4. Output table\n5. Exit");
 		printf("\nEnter your choice: ");
 		scanf("%d",&choice);
 		system("clear");
@@ -549,9 +566,8 @@ int main() {
 			case 1:	insert(con); break;
 			case 2: delete(con); break;
 			case 3: update(con); break;
-			/* case 4: filter(con); */
-			/* 		break; */
-			case 4: mysql_close(con); exit(0);
+			case 4: outputTable(con); break;
+			case 5: mysql_close(con); exit(0);
 		}
 	}
 }

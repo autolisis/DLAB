@@ -5,16 +5,11 @@
 #define tSIZE 10
 using namespace std;
 
-//Blu-Color Normalizer : FD->3NF Coverter, BCNF Checker;
-//Follows Navate's Procedure: Base FD Set -> Cannonical Form -> Minimal Cover -> Dangerous 3NF -> Lossless 3NF;
-
 class fd {
 	public:
 		string L;
 		char R;
-
-		void load(string Lin, char Rin)
-		{
+		void load(string Lin, char Rin) {
 			L = Lin;
 			R = Rin;
 		}
@@ -24,32 +19,22 @@ class relation {
 	public:
 		string attr_set;
 		int keylimiter;
-
-		string getKey()
-		{
+		string getKey() {
 			return attr_set.substr(0,keylimiter);
 		}
-
-		string getnonKey()
-		{
+		string getnonKey() {
 			if(keylimiter==attr_set.length())
 				return "";
 			return attr_set.substr(keylimiter);
 		}
-
-		void keyLoad(string key)
-		{
+		void keyLoad(string key) {
 			attr_set = key;
 			keylimiter = key.length();
 		}
-
-		void nonkeyLoad(char c)
-		{
+		void nonkeyLoad(char c) {
 			attr_set.append(1,c);
 		}
-
-		void simpleDisplay()
-		{
+		void simpleDisplay() {
 			cout<<getKey()<<" "<<getnonKey()<<endl;
 		}
 };
@@ -260,8 +245,8 @@ int NF3(fd fds[], int &SIZE, relation rset[]) //Stores decomposed 3NF relations 
 	rset[rSIZE].keyLoad(key);
 	return rSIZE+1;
 }
-
-int isBCNF(relation rset[], fd fds[], int rSIZE, int fSIZE) //Returns 1 if given relations and FDs are in BCNF, 0 otherwise
+/* Returns 1 if given relations and FDs are in BCNF, 0 otherwise */
+int isBCNF(relation rset[], fd fds[], int rSIZE, int fSIZE)
 {
 	for(int i=0;i<fSIZE;i++)
 		for(int j=0;j<rSIZE;j++)
@@ -273,25 +258,22 @@ int isBCNF(relation rset[], fd fds[], int rSIZE, int fSIZE) //Returns 1 if given
 	return 1;
 }
 
-int main()
-{
+int main() {
 	fd fds1[bSIZE], fds2[bSIZE];
 	relation rset[bSIZE];
-	int n1,rs1;
-	n1 = bulkInput(fds1,3);
+	int n1,rs1, nFd;
+	cout << "Enter number of FDs: ";
+	cin >> nFd;
+	n1 = bulkInput(fds1,nFd);
 	cout<<"\n-----\n";
-	cout<<"Cannonical Form FDs\n\n";
+	cout<<"Canonical Form FDs\n\n";
 	for(int i=0;i<n1;i++)
-	{
 		cout<<fds1[i].L<<" "<<fds1[i].R<<"\n";
-	}
 	cout<<"\n-----\n";
-	cout<<"3NF Relation Set (Key Others)\n\n";
+	cout<<"3NF Set (Key Others)\n\n";
 	rs1 = NF3(fds1, n1, rset);
 	for(int i=0;i<rs1;i++)
-	{
 		rset[i].simpleDisplay();
-	}
 	if(isBCNF(rset,fds1,rs1,n1))
 		cout<<"isBCNF?: YES";
 	else
