@@ -2,697 +2,556 @@
 #include <mysql.h>
 #include <stdio.h>
 
-struct employee
-{
-	char Fname[15], Minit, Lname[15], Address[30], Sex, Super_ssn[9],Ssn[9], Bdate[10], Mobile_no[10], Job[12];
-	float Salary;
-	int Dno;
-};
-
-struct department
-{
-	char Dname[15],Mgr_ssn[9],Mgr_start_date[10];
-	int Dnumber;
-};
-
-struct project
-{
-	char Pname[15], Plocation[15];
-	int Pnumber, Dnum;
-};
-
-struct works_on
-{
-	char Essn[9];
-	int Pno;
-	float Hours;
-};
-
-struct dept_locations
-{
-	int Dnumber
-	char Dlocation[15];
-};
-
-struct dependent
-{
-	char Essn[9], Dependent_name[15], Sex;
-	char Relationship[8], Bdate[10];
-};
-
-void finish_with_error(MYSQL *con)
-{
+void finishQuery(MYSQL *con) {
 	fprintf(stderr,"%s\n",mysql_error(con));
 	mysql_close(con);
 	exit(1);
 }
 
-void print_result(MYSQL *con)
-{
+void printResult(MYSQL *con) {
 	MYSQL_RES *result=mysql_store_result(con);
 	int num_fields,i;
 	MYSQL_ROW row;
 	MYSQL_FIELD *field;
-
 	if(result==NULL)
-		finish_with_error(con);
-
+		finishQuery(con);
 	num_fields = mysql_num_fields(result);
-
-	while(row=mysql_fetch_row(result))
-	{
-		for(i=0;i<num_fields;i++)
-		{
-			if(i==0)
-			{
+	while(row=mysql_fetch_row(result)) {
+		for(i=0;i<num_fields;i++) {
+			if(i==0) {
 				while(field = mysql_fetch_field(result))
-				{
 					printf("%s ",field->name);
-				}
 				printf("\n");
 			}
 			printf("%s ",row[i] ? row[i]:"NULL");
 		}
 	}
-
 	mysql_free_result(result);
 }
-void show_all_tables(MYSQL *con)
-{
+
+void showTable(MYSQL *con, char *tablename) {
+	printf("\n\n");
+	char query_statement[2000];
+	snprintf(query_statement,500,"SELECT * FROM %s", tablename);
+	if(mysql_query(con, query_statement))
+		finishQuery(con);
+	printResult(con);
+	printf("\n\n");
+}
+
+void showAllTables(MYSQL *con) {
 	printf("\n\n");
 	if(mysql_query(con,"SELECT * FROM EMPLOYEE"))
-		finish_with_error(con);
-	print_result(con);
-
+		finishQuery(con);
+	printResult(con);
 	printf("\n\n");
 	if(mysql_query(con,"SELECT * FROM DEPARTMENT"))
-		finish_with_error(con);
-	print_result(con);
-
+		finishQuery(con);
+	printResult(con);
 	printf("\n\n");
 	if(mysql_query(con,"SELECT * FROM PROJECT"))
-		finish_with_error(con);
-	print_result(con);
-
+		finishQuery(con);
+	printResult(con);
 	printf("\n\n");
 	if(mysql_query(con,"SELECT * FROM WORKS_ON"))
-		finish_with_error(con);
-	print_result(con);
-
+		finishQuery(con);
+	printResult(con);
 	printf("\n\n");
 	if(mysql_query(con,"SELECT * FROM DEPENDENT"))
-		finish_with_error(con);
-	print_result(con);
-
+		finishQuery(con);
+	printResult(con);
 	printf("\n\n");
 	if(mysql_query(con,"SELECT * FROM DEPT_LOCATIONS"))
-		finish_with_error(con);
-	print_result(con);
+		finishQuery(con);
+	printResult(con);
 	printf("\n\n");
 }
 
-void insert_employee(MYSQL *con)
-{
-
-	char query_statement[100];
-	struct employee e1;
-	system("clear");
+void insertEmployee(MYSQL *con) {
+	char query_statement[1000];
+	char Fname[15], Minit, Lname[15], Address[30], Sex, Super_ssn[9],Ssn[9], Bdate[10], Mobile_no[10], Job[12];
+	float Salary;
+	int Dno;
+	showTable(con, "EMPLOYEE");
 	printf("\nEnter employee details: ");
 	printf("\nFirst name: ");
-	scanf("%s",e1.Fname);
+	scanf("%s",Fname);
 	printf("\nMiddle Initial: ");
-	scanf(" %c",&e1.Minit);
+	scanf(" %c",&Minit);
 	printf("\nLast Name: ");
-	scanf("%s",e1.Lname);
+	scanf("%s",Lname);
 	printf("\nSSN: ");
-	scanf("%s",e1.Ssn);
+	scanf("%s",Ssn);
 	printf("\nAddress: ");
-	scanf("%s",e1.Address);
+	scanf("%s",Address);
 	printf("Mobile no: ");
-	scanf("%s",e1.Mobile_no);
+	scanf("%s",Mobile_no);
 	printf("\nBirth date: ");
-	scanf("%s",e1.Bdate);
+	scanf("%s",Bdate);
 	printf("\nGender: ");
-	scanf(" %c",&e1.Sex);
+	scanf(" %c",&Sex);
 	printf("\nJob: ");
-	scanf("%s",e1.Job);
+	scanf("%s",Job);
 	printf("\nSalary: ");
-	scanf("%f",&e1.Salary);
+	scanf("%f",&Salary);
 	printf("\nDepartment No: ");
-	scanf("%d",&e1.Dno);
+	scanf("%d",&Dno);
 	printf("\nSupervisor SSN: ");
-	scanf("%s",e1.Super_ssn);
-
-	snprintf(query_statement,200,"INSERT INTO EMPLOYEE VALUES (\'%s\',\'%c\',\'%s\',\'%s\',\'%s\',\'%s\',\'%c\',\'%.2f\',\'%s\',\'%d\',\'%s\',\'%s\')",e1.Fname,e1.Minit,e1.Lname,e1.Ssn,e1.Bdate,e1.Address,e1.Sex,e1.Salary,e1.Super_ssn,e1.Dno,e1.Mobile_no,e1.Job);
-
+	scanf("%s",Super_ssn);
+	snprintf(query_statement,500,"INSERT INTO EMPLOYEE VALUES (\'%s\',\'%c\',\'%s\',\'%s\',\'%s\',\'%s\',\'%c\',\'%.2f\',\'%s\',\'%d\',\'%s\',\'%s\')",Fname,Minit,Lname,Ssn,Bdate,Address,Sex,Salary,Super_ssn,Dno,Mobile_no,Job);
 	if(mysql_query(con,query_statement))
-		finish_with_error(con);
+		finishQuery(con);
 	system("clear");
-
 	printf("\n\n");
 	if(mysql_query(con,"SELECT * FROM EMPLOYEE"))
-		finish_with_error(con);
-	print_result(con);
-
+		finishQuery(con);
+	printResult(con);
 	printf("\n\n");
 }
 
-void insert_department(MYSQL *con)
-{
-	struct department d1;
-	char query_statement[200];
-
+void insertDepartment(MYSQL *con) {
+	showTable(con, "DEPARTMENT");
+	char Dname[15],Mgr_ssn[9],Mgr_start_date[10];
+	int Dnumber;
+	char query_statement[2000];
 	printf("\nFill in details of new department: ");
 	printf("\nDepartment Name: ");
-	scanf("%s",d1.Dname);
+	scanf("%s",Dname);
 	printf("\nDepartment Number: ");
-	scanf("%d",&d1.Dnumber);
+	scanf("%d",&Dnumber);
 	printf("\nManager's SSN: ");
-	scanf("%s",d1.Mgr_ssn);
+	scanf("%s",Mgr_ssn);
 	printf("\nStarting Date of manager: ");
-	scanf("%s",d1.Mgr_start_date);
-
-	snprintf(query_statement,200,"INSERT INTO DEPARTMENT VALUES (\'%s\',\'%d\',\'%s\',\'%s\')",d1.Dname,d1.Dnumber,d1.Mgr_ssn,d1.Mgr_start_date);
-
+	scanf("%s",Mgr_start_date);
+	snprintf(query_statement,600,"INSERT INTO DEPARTMENT VALUES (\'%s\',\'%d\',\'%s\',\'%s\')",Dname,Dnumber,Mgr_ssn,Mgr_start_date);
 	if(mysql_query(con,query_statement))
-		finish_with_error(con);
+		finishQuery(con);
 	system("clear");
 	printf("\n\n");
 	if(mysql_query(con,"SELECT * FROM DEPARTMENT "))
-		finish_with_error(con);
-	print_result(con);
-
+		finishQuery(con);
+	printResult(con);
 	printf("\n\n");
 }
 
-void insert_project(MYSQL *con)
-{
-	struct project p1;
-	char query_statement[200];
-
+void insertProject(MYSQL *con) {
+	showTable(con, "PROJECT");
+	char Pname[15], Plocation[15];
+	int Pnumber, Dnum;
+	char query_statement[2000];
 	printf("\nFill in details of new department: ");
 	printf("\nProject Name: ");
-	scanf("%s",p1.Pname);
+	scanf("%s",Pname);
 	printf("\nProject Number: ");
-	scanf("%d",&p1.Pnumber);
+	scanf("%d",&Pnumber);
 	printf("\nProject Location: ");
-	scanf("%s",p1.Plocation);
+	scanf("%s",Plocation);
 	printf("\nDepartment Number: ");
-	scanf("%d",&p1.Dnum);
-
-	snprintf(query_statement,200,"INSERT INTO PROJECT VALUES (\'%s\',\'%d\',\'%s\',\'%d\')",p1.Pname,p1.Pnumber,p1.Plocation,p1.Dnum);
-
+	scanf("%d",&Dnum);
+	snprintf(query_statement,600,"INSERT INTO PROJECT VALUES (\'%s\',\'%d\',\'%s\',\'%d\')",Pname,Pnumber,Plocation,Dnum);
 	if(mysql_query(con,query_statement))
-		finish_with_error(con);
+		finishQuery(con);
 	system("clear");
 	printf("\n\n");
 	if(mysql_query(con,"SELECT * FROM PROJECT "))
-		finish_with_error(con);
-	print_result(con);
-
+		finishQuery(con);
+	printResult(con);
 	printf("\n\n");
 }
 
-void insert_works_on(MYSQL *con)
-{
-	struct works_on w1;
-	char query_statement[200];
-
+void insertWorksOn(MYSQL *con) {
+	showTable(con, "WORKS_ON");
+	char Essn[9];
+	int Pno;
+	float Hours;
+	char query_statement[2000];
 	printf("\nFill in details of new department: ");
 	printf("\nEmployee SSN: ");
-	scanf("%s",w1.Essn);
+	scanf("%s",Essn);
 	printf("\nProject Number: ");
-	scanf("%d",&w1.Pno);
+	scanf("%d",&Pno);
 	printf("\nHours Spent / Week: ");
-	scanf("%f",&w1.Hours);
-
-	snprintf(query_statement,200,"INSERT INTO WORKS_ON VALUES (\'%s\',\'%d\',\'%.2f\')",w1.Essn,w1.Pno,w1.Hours);
-
+	scanf("%f",&Hours);
+	snprintf(query_statement,600,"INSERT INTO WORKS_ON VALUES (\'%s\',\'%d\',\'%.2f\')",Essn,Pno,Hours);
 	if(mysql_query(con,query_statement))
-		finish_with_error(con);
+		finishQuery(con);
 	system("clear");
 	printf("\n\n");
 	if(mysql_query(con,"SELECT * FROM WORKS_ON "))
-		finish_with_error(con);
-	print_result(con);
-
+		finishQuery(con);
+	printResult(con);
 	printf("\n\n");
 }
 
-void insert_dept_locations(MYSQL *con)
-{
-	struct dept_locations d1;
-	char query_statement[200];
-
+void insertDeptLocations(MYSQL *con) {
+	showTable(con, "DEPT_LOCATIONS");
+	int Dnumber;
+	char Dlocation[15];
+	char query_statement[2000];
 	printf("\nFill in details of new department: ");
 	printf("\nDepartment Number: ");
-	scanf("%d",&d1.Dnumber);
+	scanf("%d",&Dnumber);
 	printf("\nDepartment Location: ");
-	scanf("%s",d1.Dlocation);
-
-	snprintf(query_statement,200,"INSERT INTO DEPT_LOCATIONS VALUES (\'%d\',\'%s\')",d1.Dnumber,d1.Dlocation);
-
+	scanf("%s",Dlocation);
+	snprintf(query_statement,600,"INSERT INTO DEPT_LOCATIONS VALUES (\'%d\',\'%s\')",Dnumber,Dlocation);
 	if(mysql_query(con,query_statement))
-		finish_with_error(con);
+		finishQuery(con);
 	system("clear");
 	printf("\n\n");
 	if(mysql_query(con,"SELECT * FROM DEPT_LOCATIONS "))
-		finish_with_error(con);
-	print_result(con);
-
+		finishQuery(con);
+	printResult(con);
 	printf("\n\n");
 }
 
-void insert_dependents(MYSQL *con)
-{
-	struct dependent d1;
-	char query_statement[200];
-
+void insertDependents(MYSQL *con) {
+	showTable(con, "DEPENDENTS");
+	char Essn[9], Dependent_name[15], Sex;
+	char Relationship[8], Bdate[10];
+	char query_statement[2000];
 	printf("\nFill in details of new department: ");
 	printf("\nEmployee SSN: ");
-	scanf("%s",d1.Essn);
+	scanf("%s",Essn);
 	printf("\nDependent Name: ");
-	scanf("%s",d1.Dependent_name);
+	scanf("%s",Dependent_name);
 	printf("\nDependent Gender: ");
-	scanf(" %c",&d1.Sex);
+	scanf(" %c",&Sex);
 	printf("\nBirthday of dependent: ");
-	scanf("%s",d1.Bdate);
+	scanf("%s",Bdate);
 	printf("\nRelationship with dependent: ");
-	scanf("%s",d1.Relationship);
-
-	snprintf(query_statement,200,"INSERT INTO DEPENDENT VALUES (\'%s\',\'%s\',\'%c\',\'%s\',\'%s\')",d1.Essn,d1.Dependent_name,d1.Sex,d1.Bdate,d1.Relationship);
-
+	scanf("%s",Relationship);
+	snprintf(query_statement,600,"INSERT INTO DEPENDENT VALUES (\'%s\',\'%s\',\'%c\',\'%s\',\'%s\')",Essn,Dependent_name,Sex,Bdate,Relationship);
 	if(mysql_query(con,query_statement))
-		finish_with_error(con);
+		finishQuery(con);
 	system("clear");
 	printf("\n\n");
 	if(mysql_query(con,"SELECT * FROM DEPENDENT "))
-		finish_with_error(con);
-	print_result(con);
-
+		finishQuery(con);
+	printResult(con);
 	printf("\n\n");
 }
 
-void delete_employee(MYSQL *con)
-{
+void deleteEmployee(MYSQL *con) {
+	showTable(con, "EMPLOYEE");
 	char ssn[9];
-	char query_statement[200];
-
+	char query_statement[2000];
 	printf("\nEnter SSN: ");
 	scanf("%s",ssn);
-	snprintf(query_statement,200,"DELETE FROM EMPLOYEE WHERE Ssn LIKE \'%s\'",ssn);
+	snprintf(query_statement,600,"DELETE FROM EMPLOYEE WHERE Ssn LIKE \'%s\'",ssn);
 	if(mysql_query(con,query_statement))
-		finish_with_error(con);
+		finishQuery(con);
 	system("clear");
 	printf("\n\n");
 	if(mysql_query(con,"SELECT * FROM EMPLOYEE"))
-		finish_with_error(con);
-	print_result(con);
-
+		finishQuery(con);
+	printResult(con);
 	printf("\n\n");
 }
 
-void delete_department(MYSQL *con)
-{
+void deleteDepartment(MYSQL *con) {
+	showTable(con, "DEPARTMENT");
 	int Dnumber;
-	char query_statement[200];
-
+	char query_statement[2000];
 	printf("\nEnter Department Number: ");
 	scanf("%d",&Dnumber);
-	snprintf(query_statement,200,"DELETE FROM DEPARTMENT WHERE Dnumber LIKE \'%d\'",Dnumber);
+	snprintf(query_statement,600,"DELETE FROM DEPARTMENT WHERE Dnumber LIKE \'%d\'",Dnumber);
 	if(mysql_query(con,query_statement))
-		finish_with_error(con);
+		finishQuery(con);
 	system("clear");
 	printf("\n\n");
 	if(mysql_query(con,"SELECT * FROM DEPARTMENT"))
-		finish_with_error(con);
-	print_result(con);
-
+		finishQuery(con);
+	printResult(con);
 	printf("\n\n");
 }
 
-void delete_project(MYSQL *con)
-{
+void deleteProject(MYSQL *con) {
 	int Pnumber;
-	char query_statement[200];
-
+	char query_statement[2000];
 	printf("\nEnter Project Number: ");
 	scanf("%d",&Pnumber);
-	snprintf(query_statement,200,"DELETE FROM PROJECT WHERE Pnumber = %d",Pnumber);
+	snprintf(query_statement,600,"DELETE FROM PROJECT WHERE Pnumber = %d",Pnumber);
 	if(mysql_query(con,query_statement))
-		finish_with_error(con);
+		finishQuery(con);
 	system("clear");
 	printf("\n\n");
 	if(mysql_query(con,"SELECT * FROM PROJECT"))
-		finish_with_error(con);
-	print_result(con);
-
+		finishQuery(con);
+	printResult(con);
 	printf("\n\n");
 }
 
-void delete_works_on(MYSQL *con)
-{
+void deleteWorksOn(MYSQL *con) {
+	showTable(con, "WORKS_ON");
 	char Essn[9];
 	int Pno;
-	char query_statement[200];
-
+	char query_statement[2000];
 	printf("\nEnter SSN: ");
 	scanf("%s",Essn);
 	printf("\nEnter Project number: ");
 	scanf("%d",&Pno);
-	snprintf(query_statement,200,"DELETE FROM WORKS_ON WHERE Essn LIKE \'%s\' AND Pno = %d",Essn,Pno);
+	snprintf(query_statement,600,"DELETE FROM WORKS_ON WHERE Essn LIKE \'%s\' AND Pno = %d",Essn,Pno);
 	if(mysql_query(con,query_statement))
-		finish_with_error(con);
+		finishQuery(con);
 	system("clear");
 	printf("\n\n");
 	if(mysql_query(con,"SELECT * FROM WORKS_ON"))
-		finish_with_error(con);
-	print_result(con);
-
+		finishQuery(con);
+	printResult(con);
 	printf("\n\n");
 }
 
-void delete_dept_locations(MYSQL *con)
-{
+void deleteDeptLocations(MYSQL *con) {
+	showTable(con, "DEPT_LOCATIONS");
 	char Dlocation[15];
 	int Dnumber;
-	char query_statement[200];
-
+	char query_statement[2000];
 	printf("\nEnter Department Number: ");
 	scanf("%d",&Dnumber);
 	printf("\nEnter Department Location: ");
 	scanf("%s",Dlocation);
-	snprintf(query_statement,200,"DELETE FROM DEPT_LOCATIONS WHERE Dlocation LIKE \'%s\' AND Dnumber = %d",Dlocation,Dnumber);
+	snprintf(query_statement,600,"DELETE FROM DEPT_LOCATIONS WHERE Dlocation LIKE \'%s\' AND Dnumber = %d",Dlocation,Dnumber);
 	if(mysql_query(con,query_statement))
-		finish_with_error(con);
+		finishQuery(con);
 	system("clear");
 	printf("\n\n");
 	if(mysql_query(con,"SELECT * FROM DEPT_LOCATIONS"))
-		finish_with_error(con);
-	print_result(con);
-
+		finishQuery(con);
+	printResult(con);
 	printf("\n\n");
 }
 
-void delete_dependents(MYSQL *con)
-{
+void deleteDependents(MYSQL *con) {
+	showTable(con, "DEPENDENTS");
 	char Essn[9];
 	char Dependent_name[15];
-	char query_statement[200];
-
+	char query_statement[2000];
 	printf("\nEnter SSN: ");
 	scanf("%s",Essn);
 	printf("\nEnter Dependent name: ");
 	scanf("%s",Dependent_name);
-	snprintf(query_statement,200,"DELETE FROM DEPENDENT WHERE Essn LIKE \'%s\' AND Dependent_name LIKE \'%s\'",Essn,Dependent_name);
+	snprintf(query_statement,600,"DELETE FROM DEPENDENT WHERE Essn LIKE \'%s\' AND Dependent_name LIKE \'%s\'",Essn,Dependent_name);
 	if(mysql_query(con,query_statement))
-		finish_with_error(con);
+		finishQuery(con);
 	system("clear");
 	printf("\n\n");
 	if(mysql_query(con,"SELECT * FROM DEPENDENT"))
-		finish_with_error(con);
-	print_result(con);
-
+		finishQuery(con);
+	printResult(con);
 	printf("\n\n");
 }
 
-void update_salary(MYSQL *con)
-{
-	char Ssn[9];
-	float Salary;
-	char query_statement[200];
+/* void update(MYSQL *con) { */
+/* 	showTable(con, "EMPLOYEE"); */
+/* 	char data[100]; */
+/* 	float Salary; */
+/* 	char query_statement[2000]; */
+/* 	printf("\nEnter SSN: "); */
+/* 	scanf("%s",Ssn); */
+/* 	printf("\nSalary: "); */
+/* 	scanf("%f",&Salary); */
+/* 	snprintf(query_statement,600,"UPDATE EMPLOYEE SET Salary = %.2f WHERE Ssn LIKE \'%s\'",Salary,Ssn); */
+/* 	if(mysql_query(con,query_statement)) */
+/* 		finishQuery(con); */
+/* 	system("clear"); */
+/* 	printf("\n\n"); */
+/* 	if(mysql_query(con,"SELECT * FROM EMPLOYEE")) */
+/* 		finishQuery(con); */
+/* 	printResult(con); */
+/* 	printf("\n\n"); */
+/* } */
 
+void updateSalary(MYSQL *con) {
+	float Salary;
+	char Ssn[9];
+	int Dno;
+	char query_statement[2000];
 	printf("\nEnter SSN: ");
 	scanf("%s",Ssn);
 	printf("\nSalary: ");
 	scanf("%f",&Salary);
-	snprintf(query_statement,200,"UPDATE EMPLOYEE SET Salary = %.2f WHERE Ssn LIKE \'%s\'",Salary,Ssn);
+	snprintf(query_statement,600,"UPDATE EMPLOYEE SET Salary = %f WHERE Ssn LIKE \'%s\'",Salary,Ssn);
 	if(mysql_query(con,query_statement))
-		finish_with_error(con);
+		finishQuery(con);
 	system("clear");
 	printf("\n\n");
 	if(mysql_query(con,"SELECT * FROM EMPLOYEE"))
-		finish_with_error(con);
-	print_result(con);
-
+		finishQuery(con);
+	printResult(con);
 	printf("\n\n");
 
 }
 
-void update_dnum(MYSQL *con)
-{
+void updateDnum(MYSQL *con) {
 	char Ssn[9];
 	int Dno;
-	char query_statement[200];
-
+	char query_statement[2000];
 	printf("\nEnter SSN: ");
 	scanf("%s",Ssn);
 	printf("\nDepartment Number: ");
 	scanf("%d",&Dno);
-	snprintf(query_statement,200,"UPDATE EMPLOYEE SET Dno = %d WHERE Ssn LIKE \'%s\'",Dno,Ssn);
+	snprintf(query_statement,600,"UPDATE EMPLOYEE SET Dno = %d WHERE Ssn LIKE \'%s\'",Dno,Ssn);
 	if(mysql_query(con,query_statement))
-		finish_with_error(con);
+		finishQuery(con);
 	system("clear");
 	printf("\n\n");
 	if(mysql_query(con,"SELECT * FROM EMPLOYEE"))
-		finish_with_error(con);
-	print_result(con);
-
+		finishQuery(con);
+	printResult(con);
 	printf("\n\n");
 
 }
 
-void update_super_ssn(MYSQL *con)
-{
+void updateSuperSsn(MYSQL *con) {
 	char Ssn[9];
 	char Super_ssn[9];
-	char query_statement[200];
-
+	char query_statement[2000];
 	printf("\nEnter SSN: ");
 	scanf("%s",Ssn);
 	printf("\nSupervisor SSN: ");
 	scanf("%s",Super_ssn);
-	snprintf(query_statement,200,"UPDATE EMPLOYEE SET Super_ssn = %s WHERE Ssn LIKE \'%s\'",Super_ssn,Ssn);
+	snprintf(query_statement,600,"UPDATE EMPLOYEE SET Super_ssn = %s WHERE Ssn LIKE \'%s\'",Super_ssn,Ssn);
 	if(mysql_query(con,query_statement))
-		finish_with_error(con);
+		finishQuery(con);
 	system("clear");
 	printf("\n\n");
 	if(mysql_query(con,"SELECT * FROM EMPLOYEE"))
-		finish_with_error(con);
-	print_result(con);
-
+		finishQuery(con);
+	printResult(con);
 	printf("\n\n");
-
 }
 
-void update_address(MYSQL *con)
-{
+void updateAddress(MYSQL *con) {
 	char Ssn[9];
 	char Address[30];
-	char query_statement[200];
-
+	char query_statement[2000];
 	printf("\nEnter SSN: ");
 	scanf("%s",Ssn);
 	printf("\nAddress: ");
 	scanf("%s",Address);
-	snprintf(query_statement,200,"UPDATE EMPLOYEE SET Address = \'%s\' WHERE Ssn LIKE \'%s\'",Address,Ssn);
+	snprintf(query_statement,600,"UPDATE EMPLOYEE SET Address = \'%s\' WHERE Ssn LIKE \'%s\'",Address,Ssn);
 	if(mysql_query(con,query_statement))
-		finish_with_error(con);
+		finishQuery(con);
 	system("clear");
 	printf("\n\n");
 	if(mysql_query(con,"SELECT * FROM EMPLOYEE"))
-		finish_with_error(con);
-	print_result(con);
-
+		finishQuery(con);
+	printResult(con);
 	printf("\n\n");
 }
 
-void update_employee(MYSQL *con)
-{
+void updateEmployee(MYSQL *con) {
+	showTable(con, "EMPLOYEE");
 	int choice;
-	while(1)
-	{
+	while(1) {
 		printf("\n1. Update Salary\n2.Update Supervisor SSN\n3.Update Department Number \n4. Address\n5.Back");
 		printf("\nEnter your choice: ");
 		scanf("%d",&choice);
-
-		switch(choice)
-		{
-			case 1: update_salary(con);
-					break;
-
-			case 2: update_super_ssn(con);
-					break;
-
-			case 3: update_dnum(con);
-					break;
-
-			case 4: update_address(con);
-					break;
-
+		switch(choice) {
+			case 1: updateSalary(con); break;
+			case 2: updateSuperSsn(con); break;
+			case 3: updateDnum(con); break;
+			case 4: updateAddress(con); break;
 			case 5: return;
 		}
 	}
 }
 
-void update_department(MYSQL *con)
-{
+void updateDepartment(MYSQL *con) {
+	showTable(con, "DEPARTMENT");
 	int Dnumber;
 	char Mgr_ssn[9];
 	char query_statement[200];
-
 	printf("\nEnter Department Number: ");
 	scanf("%d",&Dnumber);
 	printf("\nManager SSN: ");
 	scanf("%s",Mgr_ssn);
 	snprintf(query_statement,200,"UPDATE DEPARTMENT SET Mgr_ssn = \'%s\' WHERE Dnumber = %d",Mgr_ssn,Dnumber);
 	if(mysql_query(con,query_statement))
-		finish_with_error(con);
+		finishQuery(con);
 	system("clear");
 	printf("\n\n");
 	if(mysql_query(con,"SELECT * FROM DEPARTMENT"))
-		finish_with_error(con);
-	print_result(con);
-
+		finishQuery(con);
+	printResult(con);
 	printf("\n\n");
 }
 
-
-
-void insert(MYSQL *con)
-{
+void insert(MYSQL *con) {
 	int choice;
-	while(1)
-	{
+	while(1) {
 		printf("\n1. Employee\n2. Department\n3. Project \n4. Works_on \n5. Department Location\n6. Dependents\n7. Back to main menu");
 		printf("\nEnter your choice: ");
 		scanf("%d",&choice);
 		system("clear");
-
-		switch(choice)
-		{
-			case 1: insert_employee(con);
-					break;
-
-			case 2: insert_department(con);
-					break;
-
-			case 3: insert_project(con);
-					break;
-
-			case 4: insert_works_on(con);
-					break;
-
-			case 5: insert_dept_locations(con);
-					break;
-
-			case 6: insert_dependents(con);
-					break;
-
+		switch(choice) {
+			case 1: insertEmployee(con); break;
+			case 2: insertDepartment(con); break;
+			case 3: insertProject(con); break;
+			case 4: insertWorksOn(con); break;
+			case 5: insertDeptLocations(con); break;
+			case 6: insertDependents(con); break;
 			case 7: return;
 		}
 	}
 }
 
-void delete(MYSQL *con)
-{
+void delete(MYSQL *con) {
 	int choice;
-	while(1)
-	{
+	while(1) {
 		printf("\n1. Employee\n2. Department\n3. Project \n4. Works_on \n5. Department Location\n6. Dependents\n7. Back to main menu");
 		printf("\nEnter your choice: ");
 		scanf("%d",&choice);
 		system("clear");
-
-		switch(choice)
-		{
-			case 1: delete_employee(con);
-					break;
-
-			case 2: delete_department(con);
-					break;
-
-			case 3: delete_project(con);
-					break;
-
-			case 4: delete_works_on(con);
-					break;
-
-			case 5: delete_dept_locations(con);
-					break;
-
-			case 6: delete_dependents(con);
-					break;
-
+		switch(choice) {
+			case 1: deleteEmployee(con); break;
+			case 2: deleteDepartment(con); break;
+			case 3: deleteProject(con); break;
+			case 4: deleteWorksOn(con); break;
+			case 5: deleteDeptLocations(con); break;
+			case 6: deleteDependents(con); break;
 			case 7: return;
 		}
 	}
 }
 
-void update(MYSQL *con)
-{
+void update(MYSQL *con) {
 	int choice;
-	while(1)
-	{
+	while(1) {
 		printf("\n1. Employee\n2. Department\n3. Back to main menu");
 		printf("\nEnter your choice: ");
 		scanf("%d",&choice);
 		system("clear");
-
-		switch(choice)
-		{
-			case 1: update_employee(con);
-					break;
-
-			case 2: update_department(con);
-					break;
-
+		switch(choice) {
+			case 1: updateEmployee(con); break;
+			case 2: updateDepartment(con); break;
 			case 3: return;
 		}
 	}
 }
 
-
-
-void main(void)
-{
+int main() {
 	MYSQL *con = mysql_init(NULL);
-
-	if(con==NULL)
-	{
+	if(con==NULL) {
 		fprintf(stderr,"\nmysql_init() failed\n");
 		exit(1);
 	}
-
-	if(mysql_real_connect(con,"localhost","james","password","COMPANY",0,NULL,0)==NULL)
-		finish_with_error(con);
-
-	show_all_tables(con);
-
+	if(mysql_real_connect(con,"localhost","root","","employee",0,NULL,0)==NULL)
+		finishQuery(con);
+	/* show_all_tables(con); */
 	int choice;
-	while(1)
-	{
+	while(1) {
 		printf("\n1. Insert\n2. Delete\n3. Update\n4. Exit");
 		printf("\nEnter your choice: ");
 		scanf("%d",&choice);
 		system("clear");
-		switch(choice)
-		{
-			case 1:	insert(con);
-					break;
-
-			case 2: delete(con);
-					break;
-
-			case 3: update(con);
-					break;
-
+		switch(choice) {
+			case 1:	insert(con); break;
+			case 2: delete(con); break;
+			case 3: update(con); break;
 			/* case 4: filter(con); */
 			/* 		break; */
-
-			case 4: mysql_close(con);
-					exit(1);
+			case 4: mysql_close(con); exit(0);
 		}
-
 	}
 }
