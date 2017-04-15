@@ -32,7 +32,7 @@ void printResult(MYSQL *con) {
 void showTable(MYSQL *con, char *tablename) {
 	printf("\n\n");
 	char query_statement[2000];
-	snprintf(query_statement,500,"SELECT * FROM %s", tablename);
+	sprintf(query_statement,"SELECT * FROM %s", tablename);
 	if(mysql_query(con, query_statement))
 		finishQuery(con);
 	printResult(con);
@@ -553,10 +553,11 @@ int main() {
 		fprintf(stderr,"\nmysql_init() failed\n");
 		exit(1);
 	}
-	if(mysql_real_connect(con,"localhost","root","","employee",0,NULL,0)==NULL)
-		finishQuery(con);
+	/* if(mysql_real_connect(con,"localhost","root","","employee",0,NULL,0)==NULL) */
+		/* finishQuery(con); */
 	/* showAllTables(con); */
 	int choice;
+	system("clear");
 	while(1) {
 		printf("\n1. Insert\n2. Delete\n3. Update\n4. Output table\n5. Exit");
 		printf("\nEnter your choice: ");

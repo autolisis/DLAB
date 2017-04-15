@@ -1,29 +1,23 @@
 #include <iostream>
 #include <set>
-#include <list>
+#include <queue>
+#include <vector>
 using namespace std;
 
-class fd {
+class FD {
 	public:
 		set <char> L;
 		char R;
+		void stringToFD(string &a) {
+			int pos = a.find('>');
+			R = a.at(pos+1);
+			string LHS = a.substr(0, pos-1);
+			for (auto a : LHS)
+				L.insert(a); } };
 
-		void load(string &Lin, char Rin) {
-			for (auto i : Lin)
-				L.insert(i);
-			R=Rin;
-		}
-};
-
-class relation {
-	public:
-		set <char> attr_set;
-		set <char>::iterator keylimiter;
-		set <char> getKey() {
-
-int main()
-{
-	int a=5:
-	return 0;
-}
-
+int main() {
+	FD a;
+	string s;
+	cin >> s;
+	a.stringToFD(s);
+	return 0; }
