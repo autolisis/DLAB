@@ -1,6 +1,7 @@
 #include <iostream>
 #include <set>
 #include <queue>
+#include <string>
 #include <vector>
 using namespace std;
 
@@ -8,16 +9,28 @@ class FD {
 	public:
 		set <char> L;
 		char R;
-		void stringToFD(string &a) {
-			int pos = a.find('>');
-			R = a.at(pos+1);
-			string LHS = a.substr(0, pos-1);
-			for (auto a : LHS)
-				L.insert(a); } };
+		FD(string &lhs, char rhs) {
+			for (auto i:lhs)
+				L.insert(i);
+			R=rhs;
+		}
+};
 
+/* in */
 int main() {
-	FD a;
+	vector <FD> fds;
 	string s;
-	cin >> s;
-	a.stringToFD(s);
-	return 0; }
+	while (1) {
+		cin >> s;
+		int split=s.find('>');
+		if (split==0)
+			break;
+		string l=s.substr(0, split);
+		string r=s.substr(split+1);
+		for (auto ch : r) {
+			FD newfd(l, ch);
+			fds.push_back(newfd);
+		}
+	}
+	return 0; 
+}
